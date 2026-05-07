@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1a1a2e">
+<title>PsiGestão</title>
+
+<style>
+:root{--bg:#0f0f1a;--bg2:#1a1a2e;--bg3:#252540;--bg4:#2a2a48;--text:#e0e0f0;--text2:#9090b0;--accent:#7c6ff7;--accent2:#5a4fcf;--green:#4ade80;--red:#f87171;--amber:#fbbf24;--blue:#60a5fa;--radius:12px;--r2:8px;--shadow:0 4px 24px rgba(0,0,0,.3);--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--aside:230px;--head:56px}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;overflow:hidden}
+button{cursor:pointer;font-family:var(--font);border:none;background:none;color:inherit}
+input,textarea,select{font-family:var(--font);font-size:14px;background:var(--bg3);border:1px solid var(--bg4);color:var(--text);border-radius:var(--r2);padding:10px 14px;outline:none;width:100%;transition:border .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:60px}
+select{appearance:auto}
+button.primary{background:var(--accent);color:#fff;padding:10px 20px;border-radius:var(--r2);font-weight:600;transition:background .2s}
+button.primary:hover{background:var(--accent2)}
+button.sm{padding:6px 12px;font-size:13px}
+button.outline{background:transparent;border:1px solid var(--bg4);color:var(--text2);padding:8px 16px;border-radius:var(--r2);transition:.2s}
+button.outline:hover{border-color:var(--accent);color:var(--text)}
+.btn-icon{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r2);transition:.15s;font-size:18px}
+.btn-icon:hover{background:var(--bg3)}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(74,222,128,.15);color:var(--green)}
+.badge-red{background:rgba(248,113,113,.15);color:var(--red)}
+.badge-amber{background:rgba(251,191,36,.15);color:var(--amber)}
+.badge-blue{background:rgba(96,165,250,.15);color:var(--blue)}
+
+/* Login */
+#login{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg),var(--bg2))}
+.login-b{background:var(--bg2);padding:40px;border-radius:var(--radius);box-shadow:var(--shadow);width:360px;max-width:90vw;text-align:center}
+.login-b h1{font-size:24px;margin-bottom:4px}
+.login-b p{color:var(--text2);font-size:13px;margin-bottom:24px}
+.login-b input{padding:12px 16px;font-size:16px;margin-bottom:8px}
+.login-b button{width:100%;padding:12px;margin-top:4px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-size:16px;font-weight:600}
+.login-b button:hover{background:var(--accent2)}
+.login-e{color:var(--red);font-size:13px;margin-top:8px;display:none}
+.lock{font-size:48px;margin-bottom:16px}
+
+/* Layout */
+#app{display:flex;height:100vh;display:none}
+.aside{width:var(--aside);background:var(--bg2);display:flex;flex-direction:column;border-right:1px solid var(--bg3);flex-shrink:0}
+.brand{padding:16px 20px;font-size:17px;font-weight:700;border-bottom:1px solid var(--bg3)}
+.brand span{color:var(--accent)}
+.nav{flex:1;padding:8px}
+.nav-i{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r2);color:var(--text2);font-size:13px;font-weight:500;transition:.15s;cursor:pointer;width:100%;text-align:left}
+.nav-i:hover{background:var(--bg3);color:var(--text)}
+.nav-i.act{background:var(--accent);color:#fff}
+.ni-ic{font-size:16px;width:22px;text-align:center}
+.aside-f{padding:12px 16px;border-top:1px solid var(--bg3)}
+.aside-f button{width:100%;padding:8px;border:1px solid var(--bg3);color:var(--text2);border-radius:var(--r2);font-size:12px;transition:.2s}
+.aside-f button:hover{border-color:var(--red);color:var(--red)}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.mh{height:var(--head);display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--bg3);flex-shrink:0}
+.mh h2{font-size:18px;font-weight:600}
+.mh-actions{display:flex;gap:8px;align-items:center}
+#content{flex:1;overflow-y:auto;padding:20px 24px}
+
+/* Cards */
+.card{background:var(--bg2);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--bg3)}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-h h3{font-size:15px;font-weight:600}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.stat-c{background:var(--bg2);border-radius:var(--radius);padding:16px;border:1px solid var(--bg3);text-align:center}
+.stat-v{font-size:28px;font-weight:700;margin-top:4px}
+.stat-l{color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;color:var(--text2);font-weight:500;border-bottom:1px solid var(--bg3);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:10px 12px;border-bottom:1px solid var(--bg3)}
+tr:hover td{background:var(--bg3)}
+
+/* Agenda grid */
+.ag-grid{display:grid;grid-template-columns:70px repeat(5,1fr);gap:2px;min-height:600px}
+.ag-time{display:flex;align-items:start;justify-content:center;padding-top:4px;font-size:11px;color:var(--text2);position:relative}
+.ag-time::after{content:'';position:absolute;top:50%;left:70px;right:0;height:1px;background:var(--bg3);pointer-events:none}
+.ag-col{min-height:600px;position:relative;background:var(--bg2);border-radius:4px}
+.ag-col.h{background:var(--bg3)}
+.ag-slot{position:absolute;left:2px;right:2px;border-radius:6px;padding:4px 6px;font-size:11px;overflow:hidden;cursor:pointer;transition:.15s;border:1px solid transparent}
+.ag-slot:hover{border-color:var(--accent);transform:scale(1.02);z-index:2}
+.ag-slot.confirmed{background:rgba(74,222,128,.2);color:var(--green)}
+.ag-slot.cancelled{background:rgba(248,113,113,.15);color:var(--red)}
+.ag-slot.pending{background:rgba(251,191,36,.15);color:var(--amber)}
+.ag-slot .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ag-slot .time{opacity:.7}
+.ag-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:12px;font-style:italic}
+.ag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ag-header h3{font-size:15px;font-weight:600}
+.ag-nav{display:flex;gap:6px;align-items:center}
+
+/* Modal */
+.modal-o{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+.modal-o.show{display:flex}
+.modal{background:var(--bg2);border-radius:var(--radius);padding:24px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-h h3{font-size:17px;font-weight:600}
+.form-g{margin-bottom:14px}
+.form-g label{display:block;font-size:13px;color:var(--text2);margin-bottom:4px;font-weight:500}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:12px;border-top:1px solid var(--bg3)}
+.btn-ghost{color:var(--text2);padding:8px 16px;border-radius:var(--r2);transition:.15s}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+
+/* Search */
+.search-b{display:flex;gap:8px;margin-bottom:12px}
+.search-b input{flex:1}
+.search-b input[type=search]{max-width:300px}
+
+/* Tabs inside */
+.sub-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--bg3);padding-bottom:4px}
+.sub-tab{padding:8px 16px;font-size:13px;color:var(--text2);border-radius:var(--r2) var(--r2) 0 0;transition:.15s;cursor:pointer}
+.sub-tab:hover{color:var(--text);background:var(--bg3)}
+.sub-tab.act{color:var(--text);background:var(--bg3);font-weight:600}
+
+/* Booking link */
+.bl-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.bl-card .bl-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.bl-card .bl-h h4{font-size:15px}
+.bl-card .bl-url{background:var(--bg3);padding:8px 12px;border-radius:var(--r2);font-size:12px;color:var(--text2);word-break:break-all;margin:8px 0;display:flex;align-items:center;gap:8px}
+.bl-card .bl-url code{flex:1;font-size:12px}
+.bl-tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;margin-right:4px;background:var(--bg4)}
+
+/* Responsive */
+@media(max-width:768px){
+  .aside{width:56px}
+  .aside .brand span{display:none}
+  .aside .nav-i span{display:none}
+  .aside .ni-ic{font-size:20px;width:auto}
+  .aside-f button span{display:none}
+  .ag-grid{grid-template-columns:50px repeat(5,1fr);font-size:10px}
+  .mh h2{font-size:15px}
+  .form-row{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:12px 20px;box-shadow:var(--shadow);z-index:200;animation:slideIn .3s;font-size:14px;max-width:360px}
+.toast.ok{border-color:var(--green)}
+.toast.err{border-color:var(--red)}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Patient card mini */
+.pc{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bg3)}
+.pc:last-child{border:none}
+.pc-av{width:40px;height:40px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.pc-info{flex:1}
+.pc-info .name{font-weight:600;font-size:14px}
+.pc-info .meta{font-size:12px;color:var(--text2)}
+.pc-actions{display:flex;gap:4px;flex-shrink:0}
+
+/* Pill tabs */
+.pill-group{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.pill{padding:6px 14px;border-radius:99px;font-size:12px;background:var(--bg3);color:var(--text2);cursor:pointer;transition:.15s}
+.pill.act{background:var(--accent);color:#fff}
+.pill:hover{background:var(--bg4)}
+
+/* Mini modal for templates */
+.temp-list{display:grid;gap:6px;margin-bottom:12px}
+.temp-item{padding:8px 12px;background:var(--bg3);border-radius:var(--r2);cursor:pointer;font-size:13px;transition:.15s}
+.temp-item:hover{background:var(--bg4);color:var(--accent)}
+
+/* Settings groups */
+.set-g{margin-bottom:16px}
+.set-g h4{font-size:14px;font-weight:600;margin-bottom:8px;color:var(--text)}
+.set-g .hint{font-size:12px;color:var(--text2);margin-top:4px}
+
+/* Loading */
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* WhatsApp green */
+.whatsapp{color:#25D366}
+.whatsapp:hover{background:rgba(37,211,102,.1)}
+.gcal{color:#4285F4}
+.gcal:hover{background:rgba(66,133,244,.1)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-b">
+    <div class="lock">🔒</div>
+    <h1>PsiGestão</h1><p>Agenda inteligente para psicólogos</p>
+    <input type="password" id="pw" placeholder="Senha" autocomplete="off" onkeydown="if(event.key==='Enter')tryLogin()">
+    <button onclick="tryLogin()">Entrar</button>
+    <div class="login-e" id="loginE">Senha incorreta</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside class="aside">
+    <div class="brand">Psi<span>Gestão</span></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="aside-f"><button onclick="logout()">🚪 <span>Sair</span></button></div>
+  </aside>
+  <div class="main">
+    <div class="mh" id="mh"><h2 id="mhTitle">Agenda</h2><div class="mh-actions" id="mhActions"></div></div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-o" id="modalO"><div class="modal" id="modal"></div></div>
+
+<script>
+// ==============================
+// STATE
+// ==============================
+const S={patients:[],appointments:[],settings:{},bookingLinks:[]};
+const LS=k=>JSON.parse(localStorage.getItem('psi_'+k)||'null');
+const LSS=(k,v)=>localStorage.setItem('psi_'+k,JSON.stringify(v));
+let curTab='agenda',curWeek=0;
+
+function loadState(){
+  S.patients=LS('patients')||[];
+  S.appointments=LS('appointments')||[];
+  S.settings=LS('settings')||{sessionValue:150,duration:50,name:'Dr(a)',whatsapp:'',notify:true,msgConfirm:'Olá {nome}, sua consulta foi confirmada para {data} às {hora}.',msgRemind:'Olá {nome}, lembrete: consulta amanhã {data} às {hora}.',msgCancel:'Olá {nome}, sua consulta de {data} às {hora} foi cancelada.'};
+  S.bookingLinks=LS('bookingLinks')||[];
+}
+function saveState(){LSS('patients',S.patients);LSS('appointments',S.appointments);LSS('settings',S.settings);LSS('bookingLinks',S.bookingLinks);}
+
+// ==============================
+// HELPERS
+// ==============================
+const uid=()=>Math.random().toString(36).slice(2,8)+Date.now().toString(36);
+const today=()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())};
+const fmtDate=d=>d.toLocaleDateString('pt-BR');
+const fmtTime=d=>d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+const weekStart=(offset=0)=>{const d=new Date();d.setDate(d.getDate()+d.getDay()*0+d.getDay());d.setDate(d.getDate()-d.getDay()+1+offset*7);return d};
+const addDays=(d,n)=>{const r=new Date(d);r.setDate(r.getDate()+n);return r};
+const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const toast=(msg,type='ok')=>{const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)};
+const weekDays=()=>{const s=weekStart(curWeek);return Array.from({length:5},(_,i)=>{const d=addDays(s,i);return{date:d,label:d.toLocaleDateString('pt-BR',{weekday:'short'})+' '+d.getDate(),full:d.toLocaleDateString('pt-BR')}})}; 
+
+function monthLabel(offset){
+  const s=weekStart(offset);const e=addDays(s,4);
+  const same=s.getMonth()===e.getMonth()&&s.getFullYear()===e.getFullYear();
+  if(same)return s.toLocaleDateString('pt-BR',{month:'long'})+' '+s.getFullYear();
+  return s.toLocaleDateString('pt-BR',{month:'short'})+' '+s.getFullYear()+' - '+e.toLocaleDateString('pt-BR',{month:'short'});
+}
+
+function patientName(id){const p=S.patients.find(x=>x.id===id);return p?p.name:'Paciente removido'}
+
+function timeToMinutes(t){const[m]=t.split(':').map(Number);return m}
+
+function getApptsForDay(d){return S.appointments.filter(a=>{const ad=new Date(a.date);return sameDay(ad,d)&&a.status!=='cancelled'})}
+
+// ==============================
+// WHATSAPP & GCAL
+// ==============================
+function waLink(phone,msg){const p=phone.replace(/\D/g,'');return p?`https://wa.me/55${p}?text=${encodeURIComponent(msg)}`:''}
+
+function gcalLink(title,dateStr,timeStr,desc){
+  const d=new Date(dateStr);const[t]=timeStr.split(':').map(Number);
+  d.setHours(t,0,0,0);const end=new Date(d);end.setMinutes(d.getMinutes()+S.settings.duration);
+  const fmt=d=>d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(d)}/${fmt(end)}&details=${encodeURIComponent(desc||'')}`;
+}
+
+// ==============================
+// NAVIGATION
+// ==============================
+const TABS=[
+  {id:'agenda',icon:'📅',label:'Agenda'},
+  {id:'patients',icon:'👥',label:'Pacientes'},
+  {id:'sessions',icon:'📋',label:'Sessões'},
+  {id:'finance',icon:'💰',label:'Financeiro'},
+  {id:'booklinks',icon:'🔗',label:'Links'},
+  {id:'settings',icon:'⚙️',label:'Config'},
+];
+
+function renderNav(){
+  const nav=document.getElementById('nav');
+  nav.innerHTML=TABS.map(t=>`<div class="nav-i${curTab===t.id?' act':''}" onclick="switchTab('${t.id}')"><span class="ni-ic">${t.icon}</span><span>${t.label}</span></div>`).join('');
+}
+
+function switchTab(tab){
+  curTab=tab;renderNav();renderTab();
+}
+
+function renderTab(){
+  const mh=document.getElementById('mh');
+  const tab=TABS.find(t=>t.id===curTab);
+  document.getElementById('mhTitle').textContent=tab.label;
+  document.getElementById('mhActions').innerHTML='';
+  const c=document.getElementById('content');
+  if(curTab==='agenda')renderAgenda(c);
+  else if(curTab==='patients')renderPatients(c);
+  else if(curTab==='sessions')renderSessions(c);
+  else if(curTab==='finance')renderFinance(c);
+  else if(curTab==='booklinks')renderBookLinks(c);
+  else if(curTab==='settings')renderSettings(c);
+}
+
+// ==============================
+// AGENDA
+// ==============================
+function renderAgenda(c){
+  const days=weekDays();
+  c.innerHTML=`
+<div class="ag-header">
+  <h3>${monthLabel(curWeek)}</h3>
+  <div class="ag-nav">
+    <button class="btn-icon" onclick="curWeek--;renderTab()">◀</button>
+    <button class="btn-icon" onclick="curWeek=0;renderTab()">📅</button>
+    <button class="btn-icon" onclick="curWeek++;renderTab()">▶</button>
+  </div>
+</div>
+<div class="pill-group">
+  <div class="pill act">Semanal</div>
+</div>
+<div class="ag-grid">
+  <div></div>
+  ${days.map(d=>`<div class="ag-col${sameDay(d.date,today())?' h':''}" data-day="${d.date.toISOString()}"><div style="text-align:center;padding:6px 0;font-size:11px;font-weight:600;color:${sameDay(d.date,today())?'var(--accent)':'var(--text2)'}">${d.label.split(' ')[0]}<br>${d.label.split(' ')[1]}</div></div>`).join('')}
+  ${(()=>{
+    const slots=[];
+    for(let h=7;h<=20;h++){
+      slots.push(`<div class="ag-time">${String(h).padStart(2,'0')}:00</div>`);
+      for(let d=0;d<5;d++){
+        const day=addDays(weekStart(curWeek),d);
+        const apps=getApptsForDay(day).filter(a=>{const ah=timeToMinutes(a.time);return ah===h});
+        const empty=apps.length===0;
+        slots.push(`<div class="ag-col" style="min-height:40px">${empty?'<div class="ag-empty">--</div>':apps.map(a=>{
+          const p=patientName(a.patientId);
+          return `<div class="ag-slot ${a.status}" onclick="openApptModal('${a.id}')" data-id="${a.id}"><div class="name">${esc(p)}</div><div class="time">${a.time}</div></div>`;
+        }).join('')}</div>`);
+      }
+    }
+    return slots.join('');
+  })()}
+</div>
+<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+  <button class="primary sm" onclick="openNewApptModal()">+ Nova Consulta</button>
+</div>`;
+
+  // Make empty slots clickable
+  document.querySelectorAll('.ag-empty').forEach(el=>{
+    const col=el.closest('.ag-col');
+    const dayI=Array.from(col.parentElement.children).indexOf(col);
+    const day=addDays(weekStart(curWeek),(dayI-1)%5);
+    el.style.cursor='pointer';
+    el.onclick=()=>openQuickBook(day);
+  });
+}
+
+function openQuickBook(day){
+  const m=document.getElementById('modal');
+  const pOpts=S.patients.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  m.innerHTML=`
+<div class="modal-h"><h3>Nova Consulta — ${fmtDate(day)}</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+<div class="form-g">
+  <label>Paciente</label>
+  <select id="qbP">${pOpts||'<option value="">Nenhum paciente cadastrado</option>'}</select>
+</div>
+<div class="form-row">
+  <div class="form-g"><label>Horário</label><input type="time" id="qbT" value="08:00"></div>
+  <div class="form-g"><label>Status</label>
+    <select id="qbS"><option value="confirmed">Confirmada</option><option value="pending">Pendente</option></select>
+  </div>
+</div>
+<div class="form-actions">
+  <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+  <button class="primary" onclick="quickBookSave()">Agendar</button>
+</div>`;
+  document.getElementById('modalO').classList.add('show');
+  window._qbDay=day;
+}
+
+function quickBookSave(){
+  const pid=document.getElementById('qbP').value;
+  if(!pid){toast('Selecione um paciente','err');return}
+  const time=document.getElementById('qbT').value;
+  const status=document.getElementById('qbS').value;
+  S.appointments.push({id:uid(),patientId:pid,date:window._qbDay.toISOString(),time,duration:S.settings.duration,status,payment:'pending',notes:'',createdAt:new Date().toISOString()});
+  saveState();closeModal();toast('Consulta agendada');renderTab();
+}
+
+// ==============================
+// PATIENTS
+// ==============================
+let pSearch='';
+function renderPatients(c){
+  const list=S.patients.filter(p=>!pSearch||p.name.toLowerCase().includes(pSearch.toLowerCase()));
+  c.innerHTML=`
+<div class="card-h"><h3>Pacientes (${S.patients.length})</h3><button class="primary sm" onclick="openPatientModal()">+ Novo</button></div>
+<div class="search-b"><input type="search" placeholder="Buscar paciente..." value="${esc(pSearch)}" oninput="pSearch=this.value;renderTab()"></div>
+${list.length?list.map(p=>{
+  const apps=S.appointments.filter(a=>a.patientId===p.id);
+  const total=apps.length;
+  const last=apps.length?apps.sort((a,b)=>new Date(b.date)-new Date(a.date))[0]:null;
+  return `<div class="pc">
+    <div class="pc-av">${p.name.charAt(0).toUpperCase()}</div>
+    <div class="pc-info">
+      <div class="name">${esc(p.name)}</div>
+      <div class="meta">${p.phone?'📞 '+p.phone:''} ${p.phone&&p.email?' · ':''} ${p.email?'✉️ '+p.email:''} · ${total} sessões ${last?' · Últ: '+fmtDate(new Date(last.date)):''}</div>
+    </div>
+    <div class="pc-actions">
+      ${p.phone?`<a href="${waLink(p.phone,'')}" target="_blank" class="btn-icon whatsapp" title="WhatsApp">📱</a>`:''}
+      <button class="btn-icon" onclick="openPatientModal('${p.id}')" title="Editar">✏️</button>
+      <button class="btn-icon" onclick="deletePatient('${p.id}')" title="Remover" style="color:var(--red)">🗑️</button>
+    </div>
+  </div>`;
+}).join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhum paciente cadastrado</div>'}
+  <div style="margin-top:12px"><button class="primary sm" onclick="openPatientModal()">+ Novo Paciente</button></div>`;
+}
+
+function openPatientModal(id){
+  const p=id?S.patients.find(x=>x.id===id):null;
+  const m=document.getElementById('modal');
+  m.innerHTML=`
+<div class="modal-h"><h3>${p?'Editar':'Novo'} Paciente</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+<div class="form-g"><label>Nome completo</label><input id="pName" value="${esc(p?.name||'')}"></div>
+<div class="form-row">
+  <div class="form-g"><label>WhatsApp (com DDD)</label><input id="pPhone" value="${esc(p?.phone||'')}" placeholder="61999999999"></div>
+  <div class="form-g"><label>Email</label><input id="pEmail" type="email" value="${esc(p?.email||'')}"></div>
+</div>
+<div class="form-g"><label>Observações clínicas</label><textarea id="pNotes" rows="3">${esc(p?.notes||'')}</textarea></div>
+<div class="form-actions">
+  <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+  <button class="primary" onclick="${id?`savePatient('${id}')`:'savePatient()'}">Salvar</button>
+</div>`;
+  document.getElementById('modalO').classList.add('show');
+}
+
+function savePatient(id){
+  const n=document.getElementById('pName').value.trim();
+  if(!n){toast('Nome é obrigatório','err');return}
+  const data={name:n,phone:document.getElementById('pPhone').value.trim(),email:document.getElementById('pEmail').value.trim(),notes:document.getElementById('pNotes').value.trim()};
+  if(id){Object.assign(S.patients.find(x=>x.id===id),data)}
+  else{S.patients.push({id:uid(),...data,createdAt:new Date().toISOString()})}
+  saveState();closeModal();toast(id?'Paciente atualizado':'Paciente cadastrado');renderTab();
+}
+
+function deletePatient(id){
+  if(!confirm('Remover paciente e todas as consultas associadas?'))return;
+  S.patients=S.patients.filter(x=>x.id!==id);
+  S.appointments=S.appointments.filter(a=>a.patientId!==id);
+  saveState();toast('Paciente removido');renderTab();
+}
+
+// ==============================
+// SESSIONS
+// ==============================
+let sFilter='all';
+function renderSessions(c){
+  let apps=[...S.appointments].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(sFilter==='today'){const t=today();apps=apps.filter(a=>sameDay(new Date(a.date),t))}
+  else if(sFilter==='week'){const s=weekStart(0),e=addDays(s,4);apps=apps.filter(a=>{const d=new Date(a.date);return d>=s&&d<=e})}
+  else if(sFilter==='pending')apps=apps.filter(a=>a.status==='pending')
+  c.innerHTML=`
+<div class="pill-group">
+  ${[{id:'all',l:'Todas'},{id:'today',l:'Hoje'},{id:'week',l:'Esta Semana'},{id:'pending',l:'Pendentes'}].map(x=>`<div class="pill${sFilter===x.id?' act':''}" onclick="sFilter='${x.id}';renderTab()">${x.l}</div>`).join('')}
+</div>
+<div style="margin-bottom:12px;font-size:13px;color:var(--text2)">${apps.length} consulta${apps.length!==1?'s':''}</div>
+<table>${apps.length?`<tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Status</th><th>Pgto</th><th></th></tr>${apps.map(a=>{
+  const p=patientName(a.patientId);
+  return `<tr onclick="openApptModal('${a.id}')" style="cursor:pointer">
+    <td>${fmtDate(new Date(a.date))}</td><td>${a.time}</td>
+    <td>${esc(p)}</td>
+    <td><span class="badge badge-${a.status==='confirmed'?'green':a.status==='cancelled'?'red':'amber'}">${a.status==='confirmed'?'Confirmada':a.status==='cancelled'?'Cancelada':'Pendente'}</span></td>
+    <td><span class="badge badge-${a.payment==='paid'?'green':a.payment==='pending'?'amber':'red'}">${a.payment==='paid'?'Pago':a.payment==='pending'?'Pendente':'Isento'}</span></td>
+    <td style="text-align:right">
+      <a href="${gcalLink('Consulta - '+p,a.date,a.time,a.notes)}" target="_blank" class="btn-icon gcal" title="Google Calendar">📅</a>
+    </td>
+  </tr>`;
+}).join('')}`:'<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text2)">Nenhuma consulta encontrada</td></tr>'}</table>`;
+}
+
+// ==============================
+// APPOINTMENT MODAL
+// ==============================
+function openApptModal(id){
+  const a=S.appointments.find(x=>x.id===id);
+  if(!a)return;
+  const p=S.patients.find(x=>x.id===a.patientId);
+  const m=document.getElementById('modal');
+  m.innerHTML=`
+<div class="modal-h"><h3>Consulta — ${esc(p?.name||'?')}</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+<div class="form-row">
+  <div class="form-g"><label>Data</label><input type="date" id="aDate" value="${a.date.split('T')[0]}"></div>
+  <div class="form-g"><label>Horário</label><input type="time" id="aTime" value="${a.time}"></div>
+</div>
+<div class="form-row">
+  <div class="form-g"><label>Status</label>
+    <select id="aStatus"><option value="confirmed" ${a.status==='confirmed'?'selected':''}>Confirmada</option><option value="pending" ${a.status==='pending'?'selected':''}>Pendente</option><option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelada</option></select>
+  </div>
+  <div class="form-g"><label>Pagamento</label>
+    <select id="aPay"><option value="pending" ${a.payment==='pending'?'selected':''}>Pendente</option><option value="paid" ${a.payment==='paid'?'selected':''}>Pago</option><option value="free" ${a.payment==='free'?'selected':''}>Isento</option></select>
+  </div>
+</div>
+<div class="form-g"><label>Anotações clínicas</label>
+  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+    <div class="temp-item" onclick="insertTemplate('Estado geral:')">Estado geral</div>
+    <div class="temp-item" onclick="insertTemplate('Técnica utilizada:')">Técnica</div>
+    <div class="temp-item" onclick="insertTemplate('Evolução:')">Evolução</div>
+    <div class="temp-item" onclick="insertTemplate('Plano:')">Plano</div>
+  </div>
+  <textarea id="aNotes" rows="5">${esc(a.notes||'')}</textarea>
+</div>
+<div class="form-actions" style="justify-content:space-between">
+  <div>
+    ${p?.phone?`<a href="${waLink(p.phone,(S.settings.msgConfirm||'Olá {nome}...').replace('{nome}',p.name).replace('{data}',fmtDate(new Date(a.date))).replace('{hora}',a.time))}" target="_blank" class="btn-icon whatsapp" title="Enviar confirmação WhatsApp">📱</a>`:''}
+    <a href="${gcalLink('Consulta - '+(p?.name||''),a.date,a.time,a.notes)}" target="_blank" class="btn-icon gcal" title="Google Calendar">📅</a>
+    <button class="btn-icon" onclick="duplicateAppt('${a.id}')" title="Duplicar">📋</button>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-ghost" onclick="closeModal()">Fechar</button>
+    <button class="primary" onclick="saveAppt('${a.id}')">Salvar</button>
+    <button class="btn-ghost" onclick="deleteAppt('${a.id}')" style="color:var(--red)">Excluir</button>
+  </div>
+</div>`;
+  window._curApptId=id;
+  document.getElementById('modalO').classList.add('show');
+}
+
+function insertTemplate(t){const ta=document.getElementById('aNotes');ta.value+=t+'\n';ta.focus()}
+
+function saveAppt(id){
+  const a=S.appointments.find(x=>x.id===id);
+  if(!a)return;
+  a.date=document.getElementById('aDate').value;
+  a.time=document.getElementById('aTime').value;
+  a.status=document.getElementById('aStatus').value;
+  a.payment=document.getElementById('aPay').value;
+  a.notes=document.getElementById('aNotes').value;
+  saveState();closeModal();toast('Consulta atualizada');renderTab();
+}
+
+function duplicateAppt(id){
+  const a=S.appointments.find(x=>x.id===id);
+  if(!a)return;
+  const copy={...a,id:uid(),date:new Date().toISOString(),status:'pending',payment:'pending',notes:'',createdAt:new Date().toISOString()};
+  S.appointments.push(copy);saveState();toast('Consulta duplicada');closeModal();renderTab();
+}
+
+function deleteAppt(id){
+  if(!confirm('Excluir esta consulta?'))return;
+  S.appointments=S.appointments.filter(x=>x.id!==id);
+  saveState();closeModal();toast('Consulta excluída');renderTab();
+}
+
+function openNewApptModal(){
+  if(!S.patients.length){toast('Cadastre um paciente primeiro','err');return}
+  const m=document.getElementById('modal');
+  m.innerHTML=`
+<div class="modal-h"><h3>Nova Consulta</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+<div class="form-g"><label>Paciente</label><select id="naP">${S.patients.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div>
+<div class="form-row">
+  <div class="form-g"><label>Data</label><input type="date" id="naD" value="${today().toISOString().split('T')[0]}"></div>
+  <div class="form-g"><label>Horário</label><input type="time" id="naT" value="08:00"></div>
+</div>
+<div class="form-g"><label>Status</label><select id="naS"><option value="confirmed">Confirmada</option><option value="pending">Pendente</option></select></div>
+<div class="form-actions">
+  <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+  <button class="primary" onclick="newApptSave()">Agendar</button>
+</div>`;
+  document.getElementById('modalO').classList.add('show');
+}
+
+function newApptSave(){
+  const pid=document.getElementById('naP').value;
+  S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',notes:'',createdAt:new Date().toISOString()});
+  saveState();closeModal();toast('Consulta agendada');renderTab();
+}
+
+// ==============================
+// FINANCE
+// ==============================
+function renderFinance(c){
+  const now=new Date();const month=now.getMonth();const year=now.getFullYear();
+  const monthApps=S.appointments.filter(a=>{const d=new Date(a.date);return d.getMonth()===month&&d.getFullYear()===year});
+  const paid=monthApps.filter(a=>a.payment==='paid').length*S.settings.sessionValue;
+  const pending=monthApps.filter(a=>a.payment==='pending').length*S.settings.sessionValue;
+  const total=monthApps.length;
+  const canceled=monthApps.filter(a=>a.status==='cancelled').length;
+  c.innerHTML=`
+<div class="stat-grid">
+  <div class="stat-c"><div class="stat-l">Faturamento</div><div class="stat-v" style="color:var(--green)}">R$ ${paid.toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">A Receber</div><div class="stat-v" style="color:var(--amber)}">R$ ${pending.toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">Sessões</div><div class="stat-v">${total}</div></div>
+  <div class="stat-c"><div class="stat-l">Canceladas</div><div class="stat-v" style="color:var(--red)}">${canceled}</div></div>
+</div>
+<div class="card">
+  <div class="card-h"><h3>Histórico — ${now.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</h3></div>
+  <table>
+    <tr><th>Data</th><th>Paciente</th><th>Valor</th><th>Status</th></tr>
+    ${monthApps.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(a=>{
+      const p=patientName(a.patientId);
+      return `<tr onclick="openApptModal('${a.id}')" style="cursor:pointer">
+        <td>${fmtDate(new Date(a.date))}</td><td>${esc(p)}</td>
+        <td>R$ ${S.settings.sessionValue.toFixed(2)}</td>
+        <td><span class="badge badge-${a.payment==='paid'?'green':a.payment==='pending'?'amber':'red'}">${a.payment==='paid'?'Pago':a.payment==='pending'?'Pendente':'Isento'}</span></td>
+      </tr>`;
+    }).join('')}
+  </table>
+  <div style="margin-top:12px"><button class="outline sm" onclick="exportCSV()">📥 Exportar CSV</button></div>
+</div>`;
+}
+
+function exportCSV(){
+  let csv='Data,Hora,Paciente,Status,Valor\n';
+  S.appointments.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(a=>{
+    const p=patientName(a.patientId);
+    csv+=`${a.date},${a.time},${p},${a.status},${a.payment==='paid'?S.settings.sessionValue:0}\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='psi-financeiro.csv';a.click();
+  toast('CSV exportado');
+}
+
+// ==============================
+// BOOKING LINKS
+// ==============================
+function renderBookLinks(c){
+  c.innerHTML=`
+<div class="card-h"><h3>Links de Agendamento</h3><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link</button></div>
+<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Compartilhe o link com seus pacientes. Eles veem os horários disponíveis e agendam direto pelo WhatsApp.</p>
+${S.bookingLinks.length?S.bookingLinks.map(bl=>{
+  const data=btoa(encodeURIComponent(JSON.stringify({name:bl.name,days:bl.days,start:bl.startHour,end:bl.endHour,dur:bl.duration,price:bl.price,gap:bl.gap,msg:bl.message,wa:S.settings.whatsapp,prof:S.settings.name})));const url=`https://psi-agenda.pages.dev/agendar/?d=${data}`;
+  return `<div class="bl-card">
+    <div class="bl-h"><h4>${esc(bl.name)||'Link de agendamento'}</h4>
+      <div style="display:flex;gap:4px">
+        <button class="btn-icon" onclick="copyText('${url}')" title="Copiar link">📋</button>
+        <button class="btn-icon" onclick="toggleBookingLink('${bl.id}')" title="${bl.active?'Desativar':'Ativar'}">${bl.active?'✅':'⏸️'}</button>
+        <button class="btn-icon" onclick="deleteBookingLink('${bl.id}')" title="Excluir" style="color:var(--red)">🗑️</button>
+      </div>
+    </div>
+    <div class="bl-url">
+      <code>${url}</code>
+      <button class="btn-icon" onclick="copyText('${url}')">📋</button>
+      <a href="${url}" target="_blank" class="btn-icon">↗️</a>
+    </div>
+    <div style="font-size:12px;color:var(--text2)">
+      <span class="bl-tag">${bl.days?.join(', ')||'Seg-Sex'}</span>
+      <span class="bl-tag">${bl.startHour||'08'}:00 - ${bl.endHour||'18'}:00</span>
+      <span class="bl-tag">${bl.duration||50}min</span>
+      <span class="bl-tag">R$ ${bl.price||S.settings.sessionValue}</span>
+      ${bl.active?'':'<span class="bl-tag" style="background:rgba(248,113,113,.15);color:var(--red)">Inativo</span>'}
+    </div>
+  </div>`;
+}).join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhum link de agendamento criado ainda.<br>Crie um link para seus pacientes agendarem online.</div>'}
+  <div style="margin-top:12px"><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link de Agendamento</button></div>`;
+  if(S.bookingLinks.length){
+    document.getElementById('mhActions').innerHTML=S.bookingLinks.filter(b=>b.active).length
+      ?`<span style="font-size:13px;color:var(--text2)">${S.bookingLinks.filter(b=>b.active).length} link${S.bookingLinks.filter(b=>b.active).length>1?'s':' ativo'} · ${S.appointments.filter(a=>a.bookingId).length} agendamentos via link</span>`
+      :'';
+  }
+}
+
+function openNewBookingLink(){
+  const m=document.getElementById('modal');
+  m.innerHTML=`
+<div class="modal-h"><h3>Novo Link de Agendamento</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+<div class="form-g"><label>Nome do link (ex: "Agendamento Online")</label><input id="blName" placeholder="Agendamento Online" value="Agendamento Online"></div>
+<div class="form-row">
+  <div class="form-g"><label>Dias da semana</label>
+    <div style="display:flex;gap:4px;flex-wrap:wrap">
+      ${['Seg','Ter','Qua','Qui','Sex','Sáb'].map((d,i)=>`<label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;padding:4px 8px;background:var(--bg3);border-radius:var(--r2)"><input type="checkbox" id="blD${i}" ${i<5?'checked':''}>${d}</label>`).join('')}
+    </div>
+  </div>
+  <div class="form-g"><label>Duração (min)</label><input type="number" id="blDur" value="${S.settings.duration}" min="30" max="120" step="10"></div>
+</div>
+<div class="form-row">
+  <div class="form-g"><label>Horário inicial</label><input type="time" id="blStart" value="08:00"></div>
+  <div class="form-g"><label>Horário final</label><input type="time" id="blEnd" value="18:00"></div>
+</div>
+<div class="form-row">
+  <div class="form-g"><label>Valor da sessão</label><input type="number" id="blPrice" value="${S.settings.sessionValue}" min="0"></div>
+  <div class="form-g"><label>Intervalo entre sessões (min)</label><input type="number" id="blGap" value="10" min="0" max="60"></div>
+</div>
+<div class="form-g"><label>Mensagem de boas-vindas</label><textarea id="blMsg" rows="2">Olá! Escolha o melhor horário para sua consulta.</textarea></div>
+<div class="form-actions">
+  <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+  <button class="primary" onclick="saveBookingLink()">Criar Link</button>
+</div>`;
+  document.getElementById('modalO').classList.add('show');
+}
+
+function saveBookingLink(){
+  const days=[];
+  for(let i=0;i<6;i++){const cb=document.getElementById('blD'+i);if(cb&&cb.checked)days.push(['Seg','Ter','Qua','Qui','Sex','Sáb'][i])}
+  if(!days.length){toast('Selecione pelo menos um dia','err');return}
+  S.bookingLinks.push({
+    id:uid(),
+    name:document.getElementById('blName').value.trim()||'Link de agendamento',
+    days,startHour:document.getElementById('blStart').value,endHour:document.getElementById('blEnd').value,
+    duration:parseInt(document.getElementById('blDur').value)||50,
+    price:parseFloat(document.getElementById('blPrice').value)||S.settings.sessionValue,
+    gap:parseInt(document.getElementById('blGap').value)||10,
+    message:document.getElementById('blMsg').value.trim(),
+    active:true,createdAt:new Date().toISOString()
+  });
+  saveState();closeModal();toast('Link de agendamento criado!');renderTab();
+}
+
+function toggleBookingLink(id){
+  const bl=S.bookingLinks.find(x=>x.id===id);
+  if(bl){bl.active=!bl.active;saveState();renderTab();toast(bl.active?'Link ativado':'Link desativado')}
+}
+
+function deleteBookingLink(id){
+  if(!confirm('Excluir este link permanentemente?'))return;
+  S.bookingLinks=S.bookingLinks.filter(x=>x.id!==id);
+  saveState();toast('Link excluído');renderTab();
+}
+
+function copyText(t){
+  navigator.clipboard.writeText(t).then(()=>toast('Copiado!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copiado!')});
+}
+
+// ==============================
+// SETTINGS
+// ==============================
+function renderSettings(c){
+  c.innerHTML=`
+<div class="card">
+  <div class="set-g">
+    <h4>Dados do profissional</h4>
+    <div class="form-g"><label>Seu nome (para mensagens)</label><input id="sName" value="${esc(S.settings.name)}"></div>
+    <div class="form-g"><label>Seu WhatsApp (para receber agendamentos)</label><input id="sWA" value="${esc(S.settings.whatsapp)}" placeholder="61999999999"></div>
+  </div>
+  <div class="set-g">
+    <h4>Padrões de consulta</h4>
+    <div class="form-row">
+      <div class="form-g"><label>Valor da sessão (R$)</label><input type="number" id="sVal" value="${S.settings.sessionValue}" min="0"></div>
+      <div class="form-g"><label>Duração (min)</label><input type="number" id="sDur" value="${S.settings.duration}" min="30" max="120" step="10"></div>
+    </div>
+  </div>
+  <div class="set-g">
+    <h4>Modelos de mensagem WhatsApp</h4>
+    <div class="form-g"><label>Confirmação</label><textarea id="sMsgC" rows="2">${esc(S.settings.msgConfirm||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div>
+    <div class="form-g"><label>Lembrete</label><textarea id="sMsgR" rows="2">${esc(S.settings.msgRemind||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div>
+    <div class="form-g"><label>Cancelamento</label><textarea id="sMsgX" rows="2">${esc(S.settings.msgCancel||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div>
+  </div>
+  <button class="primary" onclick="saveSettings()">Salvar Configurações</button>
+</div>`;
+}
+
+function saveSettings(){
+  S.settings.name=document.getElementById('sName').value.trim()||'Dr(a)';
+  S.settings.whatsapp=document.getElementById('sWA').value.trim();
+  S.settings.sessionValue=parseFloat(document.getElementById('sVal').value)||150;
+  S.settings.duration=parseInt(document.getElementById('sDur').value)||50;
+  S.settings.msgConfirm=document.getElementById('sMsgC').value.trim();
+  S.settings.msgRemind=document.getElementById('sMsgR').value.trim();
+  S.settings.msgCancel=document.getElementById('sMsgX').value.trim();
+  saveState();toast('Configurações salvas');
+}
+
+// ==============================
+// MODAL
+// ==============================
+function closeModal(){document.getElementById('modalO').classList.remove('show')}
+
+// ==============================
+// LOGIN
+// ==============================
+function tryLogin(){
+  const pw=document.getElementById('pw').value;
+  if(pw==='ojoaojm123'){document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex'}
+  else{document.getElementById('loginE').style.display='block';document.getElementById('pw').value=''}
+}
+
+function logout(){document.getElementById('app').style.display='none';document.getElementById('login').style.display='flex';document.getElementById('pw').value='';document.getElementById('loginE').style.display='none'}
+
+// ==============================
+// INIT
+// ==============================
+loadState();
+renderNav();
+// Auto-login if already logged (session)
+if(sessionStorage.getItem('psi_logged')){document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';renderTab()}
+// Patch login to set session
+const _try=tryLogin;tryLogin=function(){const pw=document.getElementById('pw').value;if(pw==='ojoaojm123'){sessionStorage.setItem('psi_logged','1');_try()}}
+</script>
+</body>
+</html>
