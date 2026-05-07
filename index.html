@@ -125,13 +125,19 @@ tr:hover td{background:var(--bg3)}
 .bl-card .bl-url code{flex:1;font-size:12px}
 .bl-tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;margin-right:4px;background:var(--bg4)}
 
+/* Hamburger */
+.hamb{display:none;width:36px;height:36px;align-items:center;justify-content:center;border-radius:var(--r2);font-size:22px;cursor:pointer;transition:.15s;flex-shrink:0}
+.hamb:hover{background:var(--bg3)}
+
+/* Sidebar overlay */
+.sb-overlay{position:fixed;inset:0;z-index:89;background:rgba(0,0,0,.5);display:none}
+
 /* Responsive */
 @media(max-width:768px){
-  .aside{width:56px}
-  .aside .brand span{display:none}
-  .aside .nav-i span{display:none}
-  .aside .ni-ic{font-size:20px;width:auto}
-  .aside-f button span{display:none}
+  .hamb{display:flex}
+  .aside{position:fixed;top:0;left:0;bottom:0;z-index:90;width:280px;transform:translateX(-100%);transition:transform .25s;box-shadow:var(--shadow)}
+  .aside.open{transform:translateX(0)}
+  .sb-overlay.show{display:block}
   .ag-grid{grid-template-columns:50px repeat(5,1fr);font-size:10px}
   .mh h2{font-size:15px}
   .form-row{grid-template-columns:1fr}
@@ -195,13 +201,14 @@ tr:hover td{background:var(--bg3)}
 
 <!-- APP -->
 <div id="app">
-  <aside class="aside">
+  <aside class="aside" id="aside">
     <div class="brand">Psi<span>Gestão</span></div>
     <nav class="nav" id="nav"></nav>
     <div class="aside-f"><button onclick="logout()">🚪 <span>Sair</span></button></div>
   </aside>
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
   <div class="main">
-    <div class="mh" id="mh"><h2 id="mhTitle">Agenda</h2><div class="mh-actions" id="mhActions"></div></div>
+    <div class="mh" id="mh"><button class="hamb" id="hamb" onclick="toggleSidebar()">☰</button><h2 id="mhTitle">Agenda</h2><div class="mh-actions" id="mhActions"></div></div>
     <div id="content"></div>
   </div>
 </div>
@@ -283,7 +290,7 @@ function renderNav(){
 }
 
 function switchTab(tab){
-  curTab=tab;renderNav();renderTab();
+  curTab=tab;renderNav();renderTab();closeSidebar();
 }
 
 function renderTab(){
@@ -753,6 +760,22 @@ function saveSettings(){
   S.settings.msgRemind=document.getElementById('sMsgR').value.trim();
   S.settings.msgCancel=document.getElementById('sMsgX').value.trim();
   saveState();toast('Configurações salvas');
+}
+
+// ==============================
+// SIDEBAR TOGGLE
+// ==============================
+function toggleSidebar(){
+  const a=document.getElementById('aside');
+  const o=document.getElementById('sbOverlay');
+  a.classList.toggle('open');
+  o.classList.toggle('show');
+}
+function closeSidebar(){
+  const a=document.getElementById('aside');
+  const o=document.getElementById('sbOverlay');
+  a.classList.remove('open');
+  o.classList.remove('show');
 }
 
 // ==============================
