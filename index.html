@@ -624,7 +624,7 @@ function renderBookLinks(c){
 <div class="card-h"><h3>Links de Agendamento</h3><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link</button></div>
 <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Compartilhe o link com seus pacientes. Eles veem os horários disponíveis e agendam direto pelo WhatsApp.</p>
 ${S.bookingLinks.length?S.bookingLinks.map(bl=>{
-  const data=btoa(encodeURIComponent(JSON.stringify({name:bl.name,days:bl.days,start:bl.startHour,end:bl.endHour,dur:bl.duration,price:bl.price,gap:bl.gap,msg:bl.message,wa:S.settings.whatsapp,prof:S.settings.name})));const url=`https://psi-agenda.pages.dev/agendar/?d=${data}`;
+  const data=btoa(encodeURIComponent(JSON.stringify({name:bl.name,days:bl.days,start:bl.startHour,end:bl.endHour,dur:bl.duration,price:bl.price,gap:bl.gap,msg:bl.message,wa:S.settings.whatsapp,prof:S.settings.name})));const url=`https://tiagohanna123.github.io/psi-agenda/agendar/?d=${data}`;
   return `<div class="bl-card">
     <div class="bl-h"><h4>${esc(bl.name)||'Link de agendamento'}</h4>
       <div style="display:flex;gap:4px">
