@@ -3,11 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#1a1a2e">
-<title>PsiGestão</title>
-
+<meta name="theme-color" content="#000000">
+<title>PsiGestão — Botafogo</title>
 <style>
-:root{--bg:#0f0f1a;--bg2:#1a1a2e;--bg3:#252540;--bg4:#2a2a48;--text:#e0e0f0;--text2:#9090b0;--accent:#7c6ff7;--accent2:#5a4fcf;--green:#4ade80;--red:#f87171;--amber:#fbbf24;--blue:#60a5fa;--radius:12px;--r2:8px;--shadow:0 4px 24px rgba(0,0,0,.3);--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--aside:230px;--head:56px}
+:root{
+  --bg:#000;
+  --bg2:#111;
+  --bg3:#1a1a1a;
+  --bg4:#2a2a2a;
+  --text:#f0f0f0;
+  --text2:#999;
+  --accent:#E85D1F;
+  --accent2:#d04d10;
+  --green:#22C55E;
+  --red:#EF4444;
+  --amber:#F59E0B;
+  --blue:#3B82F6;
+  --radius:12px;
+  --r2:8px;
+  --shadow:0 4px 24px rgba(0,0,0,.5);
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --aside:230px;
+  --head:56px;
+  --botafogo:#E85D1F;
+}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;overflow:hidden}
 button{cursor:pointer;font-family:var(--font);border:none;background:none;color:inherit}
@@ -15,6 +34,14 @@ input,textarea,select{font-family:var(--font);font-size:14px;background:var(--bg
 input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 textarea{resize:vertical;min-height:60px}
 select{appearance:auto}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Botafogo decorators */
+.star{display:inline-block;color:var(--accent);margin-right:4px}
+.glow{text-shadow:0 0 20px rgba(232,93,31,.3)}
+
+/* Buttons */
 button.primary{background:var(--accent);color:#fff;padding:10px 20px;border-radius:var(--r2);font-weight:600;transition:background .2s}
 button.primary:hover{background:var(--accent2)}
 button.sm{padding:6px 12px;font-size:13px}
@@ -23,32 +50,35 @@ button.outline:hover{border-color:var(--accent);color:var(--text)}
 .btn-icon{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r2);transition:.15s;font-size:18px}
 .btn-icon:hover{background:var(--bg3)}
 .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
-.badge-green{background:rgba(74,222,128,.15);color:var(--green)}
-.badge-red{background:rgba(248,113,113,.15);color:var(--red)}
-.badge-amber{background:rgba(251,191,36,.15);color:var(--amber)}
-.badge-blue{background:rgba(96,165,250,.15);color:var(--blue)}
+.badge-green{background:rgba(34,197,94,.15);color:var(--green)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--amber)}
+.badge-blue{background:rgba(59,130,246,.15);color:var(--blue)}
+.badge-gray{background:rgba(153,153,153,.15);color:var(--text2)}
 
 /* Login */
-#login{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg),var(--bg2))}
-.login-b{background:var(--bg2);padding:40px;border-radius:var(--radius);box-shadow:var(--shadow);width:360px;max-width:90vw;text-align:center}
-.login-b h1{font-size:24px;margin-bottom:4px}
+#login{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:#000}
+.login-b{background:var(--bg2);padding:40px;border-radius:var(--radius);box-shadow:var(--shadow);width:360px;max-width:90vw;text-align:center;border:1px solid var(--bg3)}
+.login-b .star-logo{font-size:64px;color:var(--accent);margin-bottom:8px;display:block}
+.login-b h1{font-size:26px;margin-bottom:2px;font-weight:800}
+.login-b h1 span{color:var(--accent)}
 .login-b p{color:var(--text2);font-size:13px;margin-bottom:24px}
 .login-b input{padding:12px 16px;font-size:16px;margin-bottom:8px}
 .login-b button{width:100%;padding:12px;margin-top:4px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-size:16px;font-weight:600}
 .login-b button:hover{background:var(--accent2)}
 .login-e{color:var(--red);font-size:13px;margin-top:8px;display:none}
-.lock{font-size:48px;margin-bottom:16px}
 
 /* Layout */
 #app{display:flex;height:100vh;display:none}
 .aside{width:var(--aside);background:var(--bg2);display:flex;flex-direction:column;border-right:1px solid var(--bg3);flex-shrink:0}
-.brand{padding:16px 20px;font-size:17px;font-weight:700;border-bottom:1px solid var(--bg3)}
+.brand{padding:16px 20px;font-size:15px;font-weight:700;border-bottom:1px solid var(--bg3);display:flex;align-items:center;gap:8px}
+.brand .star-icon{font-size:18px;color:var(--accent)}
 .brand span{color:var(--accent)}
-.nav{flex:1;padding:8px}
+.nav{flex:1;padding:8px;overflow-y:auto}
 .nav-i{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r2);color:var(--text2);font-size:13px;font-weight:500;transition:.15s;cursor:pointer;width:100%;text-align:left}
 .nav-i:hover{background:var(--bg3);color:var(--text)}
-.nav-i.act{background:var(--accent);color:#fff}
-.ni-ic{font-size:16px;width:22px;text-align:center}
+.nav-i.act{background:var(--accent);color:#fff;font-weight:600}
+.ni-ic{font-size:15px;width:20px;text-align:center}
 .aside-f{padding:12px 16px;border-top:1px solid var(--bg3)}
 .aside-f button{width:100%;padding:8px;border:1px solid var(--bg3);color:var(--text2);border-radius:var(--r2);font-size:12px;transition:.2s}
 .aside-f button:hover{border-color:var(--red);color:var(--red)}
@@ -56,9 +86,13 @@ button.outline:hover{border-color:var(--accent);color:var(--text)}
 /* Main */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .mh{height:var(--head);display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--bg3);flex-shrink:0}
-.mh h2{font-size:18px;font-weight:600}
+.mh h2{font-size:17px;font-weight:700}
+.mh h2 .star-mini{color:var(--accent);font-size:14px;margin-right:4px}
 .mh-actions{display:flex;gap:8px;align-items:center}
 #content{flex:1;overflow-y:auto;padding:20px 24px}
+#content::-webkit-scrollbar{width:6px}
+#content::-webkit-scrollbar-track{background:transparent}
+#content::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
 
 /* Cards */
 .card{background:var(--bg2);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--bg3)}
@@ -68,6 +102,17 @@ button.outline:hover{border-color:var(--accent);color:var(--text)}
 .stat-c{background:var(--bg2);border-radius:var(--radius);padding:16px;border:1px solid var(--bg3);text-align:center}
 .stat-v{font-size:28px;font-weight:700;margin-top:4px}
 .stat-l{color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Dashboard */
+.db-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.db-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:16px}
+.db-card h4{font-size:13px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:500}
+.db-card .db-val{font-size:22px;font-weight:700}
+.db-card .db-sub{font-size:12px;color:var(--text2);margin-top:4px}
+.insight-card{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--accent);border-radius:var(--radius);padding:14px;margin-bottom:8px;font-size:13px;display:flex;align-items:center;gap:10px}
+.insight-card .icn{font-size:20px;flex-shrink:0}
+.insight-card .txt{flex:1}
+.insight-card .txt strong{color:var(--accent)}
 
 /* Table */
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -79,24 +124,23 @@ tr:hover td{background:var(--bg3)}
 .ag-grid{display:grid;grid-template-columns:70px repeat(5,1fr);gap:2px;min-height:600px}
 .ag-time{display:flex;align-items:start;justify-content:center;padding-top:4px;font-size:11px;color:var(--text2);position:relative}
 .ag-time::after{content:'';position:absolute;top:50%;left:70px;right:0;height:1px;background:var(--bg3);pointer-events:none}
-.ag-col{min-height:600px;position:relative;background:var(--bg2);border-radius:4px}
+.ag-col{min-height:40px;position:relative;background:var(--bg2);border-radius:4px}
 .ag-col.h{background:var(--bg3)}
 .ag-slot{position:absolute;left:2px;right:2px;border-radius:6px;padding:4px 6px;font-size:11px;overflow:hidden;cursor:pointer;transition:.15s;border:1px solid transparent}
 .ag-slot:hover{border-color:var(--accent);transform:scale(1.02);z-index:2}
-.ag-slot.confirmed{background:rgba(74,222,128,.2);color:var(--green)}
-.ag-slot.cancelled{background:rgba(248,113,113,.15);color:var(--red)}
-.ag-slot.pending{background:rgba(251,191,36,.15);color:var(--amber)}
+.ag-slot.confirmed{background:rgba(34,197,94,.2);color:var(--green)}
+.ag-slot.cancelled{background:rgba(239,68,68,.15);color:var(--red)}
+.ag-slot.pending{background:rgba(245,158,11,.15);color:var(--amber)}
 .ag-slot .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ag-slot .time{opacity:.7}
-.ag-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:12px;font-style:italic}
+.ag-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:11px}
 .ag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.ag-header h3{font-size:15px;font-weight:600}
 .ag-nav{display:flex;gap:6px;align-items:center}
 
 /* Modal */
-.modal-o{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+.modal-o{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 .modal-o.show{display:flex}
-.modal{background:var(--bg2);border-radius:var(--radius);padding:24px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal{background:var(--bg2);border-radius:var(--radius);padding:24px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow);border:1px solid var(--bg3)}
 .modal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .modal-h h3{font-size:17px;font-weight:600}
 .form-g{margin-bottom:14px}
@@ -109,15 +153,20 @@ tr:hover td{background:var(--bg3)}
 /* Search */
 .search-b{display:flex;gap:8px;margin-bottom:12px}
 .search-b input{flex:1}
-.search-b input[type=search]{max-width:300px}
 
-/* Tabs inside */
+/* Sub tabs */
 .sub-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--bg3);padding-bottom:4px}
 .sub-tab{padding:8px 16px;font-size:13px;color:var(--text2);border-radius:var(--r2) var(--r2) 0 0;transition:.15s;cursor:pointer}
 .sub-tab:hover{color:var(--text);background:var(--bg3)}
 .sub-tab.act{color:var(--text);background:var(--bg3);font-weight:600}
 
-/* Booking link */
+/* Pill tabs */
+.pill-group{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.pill{padding:6px 14px;border-radius:99px;font-size:12px;background:var(--bg3);color:var(--text2);cursor:pointer;transition:.15s}
+.pill.act{background:var(--accent);color:#fff}
+.pill:hover{background:var(--bg4)}
+
+/* Booking link card */
 .bl-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:16px;margin-bottom:12px}
 .bl-card .bl-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .bl-card .bl-h h4{font-size:15px}
@@ -128,9 +177,96 @@ tr:hover td{background:var(--bg3)}
 /* Hamburger */
 .hamb{display:none;width:36px;height:36px;align-items:center;justify-content:center;border-radius:var(--r2);font-size:22px;cursor:pointer;transition:.15s;flex-shrink:0}
 .hamb:hover{background:var(--bg3)}
+.sb-overlay{position:fixed;inset:0;z-index:89;background:rgba(0,0,0,.6);display:none}
 
-/* Sidebar overlay */
-.sb-overlay{position:fixed;inset:0;z-index:89;background:rgba(0,0,0,.5);display:none}
+/* Template items */
+.temp-list{display:grid;gap:6px;margin-bottom:12px}
+.temp-item{padding:8px 12px;background:var(--bg3);border-radius:var(--r2);cursor:pointer;font-size:13px;transition:.15s}
+.temp-item:hover{background:var(--bg4);color:var(--accent)}
+
+/* Settings groups */
+.set-g{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bg3)}
+.set-g:last-child{border-bottom:none;margin-bottom:0}
+.set-g h4{font-size:14px;font-weight:600;margin-bottom:8px;color:var(--text);display:flex;align-items:center;gap:6px}
+.set-g .hint{font-size:12px;color:var(--text2);margin-top:4px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:12px 20px;box-shadow:var(--shadow);z-index:200;animation:slideIn .3s;font-size:14px;max-width:360px;border-left:3px solid var(--green)}
+.toast.err{border-left-color:var(--red)}
+.toast.warn{border-left-color:var(--amber)}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Patient card */
+.pc{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bg3);cursor:pointer;transition:.1s}
+.pc:hover{background:var(--bg3);margin:0 -12px;padding:10px 12px;border-radius:var(--r2)}
+.pc:last-child{border:none}
+.pc-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff6b2b);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;color:#fff;font-weight:700}
+.pc-info{flex:1;min-width:0}
+.pc-info .name{font-weight:600;font-size:14px}
+.pc-info .meta{font-size:12px;color:var(--text2)}
+.pc-actions{display:flex;gap:4px;flex-shrink:0}
+
+/* Evolução timeline */
+.tl-item{padding:12px;border-left:2px solid var(--accent);margin-left:8px;margin-bottom:12px;position:relative}
+.tl-item::before{content:'';position:absolute;left:-6px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.tl-item .tl-date{font-size:11px;color:var(--text2);margin-bottom:4px}
+.tl-item .tl-text{font-size:13px;line-height:1.5}
+
+/* Notas */
+.note-card{background:var(--bg3);border-radius:var(--r2);padding:12px;margin-bottom:8px;cursor:pointer;transition:.15s}
+.note-card:hover{border-color:var(--accent)}
+.note-card .note-date{font-size:11px;color:var(--text2);margin-bottom:4px}
+.note-card .note-text{font-size:13px;white-space:pre-wrap;word-break:break-word}
+
+/* Mural */
+.mural-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r2);margin-bottom:8px;transition:.15s;cursor:pointer}
+.mural-item:hover{border:1px solid var(--accent);padding:11px}
+.mural-item .m-icon{font-size:20px;flex-shrink:0}
+.mural-item .m-info{flex:1}
+.mural-item .m-title{font-weight:600;font-size:13px}
+.mural-item .m-desc{font-size:12px;color:var(--text2)}
+
+/* Honorários */
+.recibo-box{background:var(--bg3);border-radius:var(--r2);padding:16px;margin-bottom:8px}
+.recibo-box .rec-linha{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.recibo-box .rec-total{font-weight:700;color:var(--accent);font-size:16px;padding-top:8px;border-top:1px solid var(--bg4);margin-top:8px}
+
+/* Pattern analysis */
+.pattern-card{background:var(--bg3);border-radius:var(--r2);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.pattern-card .p-day{font-weight:700;color:var(--accent);font-size:16px;width:36px;text-align:center;flex-shrink:0}
+.pattern-card .p-info{flex:1}
+.pattern-card .p-info .p-name{font-weight:600;font-size:13px}
+.pattern-card .p-info .p-detail{font-size:12px;color:var(--text2)}
+.pattern-card .p-pct{font-size:20px;font-weight:700;color:var(--green);flex-shrink:0}
+
+/* WhatsApp and GCal colors */
+.whatsapp{color:#25D366}
+.whatsapp:hover{background:rgba(37,211,102,.1)}
+.gcal{color:#4285F4}
+.gcal:hover{background:rgba(66,133,244,.1)}
+
+/* Status colors */
+.text-green{color:var(--green)}
+.text-red{color:var(--red)}
+.text-amber{color:var(--amber)}
+.text-accent{color:var(--accent)}
+
+/* Print recibo */
+@media print{body *{visibility:hidden}#reciboPrint,#reciboPrint *{visibility:visible}#reciboPrint{position:fixed;top:0;left:0;width:100%;padding:40px;background:#fff;color:#000;font-size:14px}}
+
+/* Horários sugeridos */
+.sug-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:12px}
+.sug-card{background:var(--bg3);border:1px solid var(--bg4);border-radius:var(--r2);padding:12px;text-align:center}
+.sug-card .sug-dia{font-weight:700;color:var(--accent);font-size:14px}
+.sug-card .sug-hora{font-size:12px;color:var(--text2);margin:4px 0}
+.sug-card .sug-pct{font-size:24px;font-weight:700;color:var(--green)}
+.sug-card .sug-label{font-size:11px;color:var(--text2)}
+.sug-card.sug-high{border-color:var(--accent);background:linear-gradient(135deg,var(--bg3),rgba(232,93,31,.1))}
+
+/* Quick actions */
+.qactions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.qactions button{display:flex;align-items:center;gap:6px;padding:10px 16px;background:var(--bg3);border:1px solid var(--bg4);border-radius:var(--r2);font-size:13px;transition:.15s}
+.qactions button:hover{border-color:var(--accent);background:var(--bg4)}
 
 /* Responsive */
 @media(max-width:768px){
@@ -142,48 +278,11 @@ tr:hover td{background:var(--bg3)}
   .mh h2{font-size:15px}
   .form-row{grid-template-columns:1fr}
   .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .db-grid{grid-template-columns:1fr}
+  .sug-grid{grid-template-columns:1fr 1fr}
+  #content{padding:12px}
+  .mh{padding:0 12px}
 }
-
-/* Toast */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:12px 20px;box-shadow:var(--shadow);z-index:200;animation:slideIn .3s;font-size:14px;max-width:360px}
-.toast.ok{border-color:var(--green)}
-.toast.err{border-color:var(--red)}
-@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-/* Patient card mini */
-.pc{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bg3)}
-.pc:last-child{border:none}
-.pc-av{width:40px;height:40px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.pc-info{flex:1}
-.pc-info .name{font-weight:600;font-size:14px}
-.pc-info .meta{font-size:12px;color:var(--text2)}
-.pc-actions{display:flex;gap:4px;flex-shrink:0}
-
-/* Pill tabs */
-.pill-group{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
-.pill{padding:6px 14px;border-radius:99px;font-size:12px;background:var(--bg3);color:var(--text2);cursor:pointer;transition:.15s}
-.pill.act{background:var(--accent);color:#fff}
-.pill:hover{background:var(--bg4)}
-
-/* Mini modal for templates */
-.temp-list{display:grid;gap:6px;margin-bottom:12px}
-.temp-item{padding:8px 12px;background:var(--bg3);border-radius:var(--r2);cursor:pointer;font-size:13px;transition:.15s}
-.temp-item:hover{background:var(--bg4);color:var(--accent)}
-
-/* Settings groups */
-.set-g{margin-bottom:16px}
-.set-g h4{font-size:14px;font-weight:600;margin-bottom:8px;color:var(--text)}
-.set-g .hint{font-size:12px;color:var(--text2);margin-top:4px}
-
-/* Loading */
-.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* WhatsApp green */
-.whatsapp{color:#25D366}
-.whatsapp:hover{background:rgba(37,211,102,.1)}
-.gcal{color:#4285F4}
-.gcal:hover{background:rgba(66,133,244,.1)}
 </style>
 </head>
 <body>
@@ -191,8 +290,9 @@ tr:hover td{background:var(--bg3)}
 <!-- LOGIN -->
 <div id="login">
   <div class="login-b">
-    <div class="lock">🔒</div>
-    <h1>PsiGestão</h1><p>Agenda inteligente para psicólogos</p>
+    <div class="star-logo">★</div>
+    <h1>★ Psi<span>Gestão</span></h1>
+    <p>★ Gestão inteligente para psicólogos</p>
     <input type="password" id="pw" placeholder="Senha" autocomplete="off" onkeydown="if(event.key==='Enter')tryLogin()">
     <button onclick="tryLogin()">Entrar</button>
     <div class="login-e" id="loginE">Senha incorreta</div>
@@ -202,13 +302,13 @@ tr:hover td{background:var(--bg3)}
 <!-- APP -->
 <div id="app">
   <aside class="aside" id="aside">
-    <div class="brand">Psi<span>Gestão</span></div>
+    <div class="brand"><span class="star-icon">★</span>Psi<span>Gestão</span></div>
     <nav class="nav" id="nav"></nav>
     <div class="aside-f"><button onclick="logout()">🚪 <span>Sair</span></button></div>
   </aside>
   <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
   <div class="main">
-    <div class="mh" id="mh"><button class="hamb" id="hamb" onclick="toggleSidebar()">☰</button><h2 id="mhTitle">Agenda</h2><div class="mh-actions" id="mhActions"></div></div>
+    <div class="mh"><button class="hamb" id="hamb" onclick="toggleSidebar()">☰</button><h2 id="mhTitle">Dashboard</h2><div class="mh-actions" id="mhActions"></div></div>
     <div id="content"></div>
   </div>
 </div>
@@ -216,22 +316,51 @@ tr:hover td{background:var(--bg3)}
 <!-- MODAL -->
 <div class="modal-o" id="modalO"><div class="modal" id="modal"></div></div>
 
+<div id="reciboPrint" style="display:none"></div>
+
 <script>
 // ==============================
 // STATE
 // ==============================
-const S={patients:[],appointments:[],settings:{},bookingLinks:[]};
-const LS=k=>JSON.parse(localStorage.getItem('psi_'+k)||'null');
-const LSS=(k,v)=>localStorage.setItem('psi_'+k,JSON.stringify(v));
-let curTab='agenda',curWeek=0;
+const S={patients:[],appointments:[],settings:{},bookingLinks:[],notes:[],muralItems:[]};
+const LS=k=>JSON.parse(localStorage.getItem('bf_'+k)||'null');
+const LSS=(k,v)=>localStorage.setItem('bf_'+k,JSON.stringify(v));
+let curTab='dashboard',curWeek=0;
 
 function loadState(){
   S.patients=LS('patients')||[];
   S.appointments=LS('appointments')||[];
-  S.settings=LS('settings')||{sessionValue:150,duration:50,name:'Dr(a)',whatsapp:'',notify:true,msgConfirm:'Olá {nome}, sua consulta foi confirmada para {data} às {hora}.',msgRemind:'Olá {nome}, lembrete: consulta amanhã {data} às {hora}.',msgCancel:'Olá {nome}, sua consulta de {data} às {hora} foi cancelada.'};
+  S.settings=LS('settings')||{
+    sessionValue:150,duration:50,name:'Dr(a)',whatsapp:'',crp:'',endereco:'',telefone:'',pix:'',
+    notify:true,
+    msgConfirm:'Olá {nome}! Sua consulta foi confirmada para {data} às {hora}. Estarei esperando por você. ★',
+    msgRemind:'Olá {nome}! Lembrete: amanhã temos consulta às {hora}. Confirme sua presença! ★',
+    msgCancel:'Olá {nome}! Sua consulta de {data} às {hora} precisou ser cancelada. Me avise se quiser reagendar. ★',
+    videoLink:'https://meet.google.com/'
+  };
   S.bookingLinks=LS('bookingLinks')||[];
+  S.notes=LS('notes')||[];
+  S.muralItems=LS('muralItems')||getDefaultMural();
 }
-function saveState(){LSS('patients',S.patients);LSS('appointments',S.appointments);LSS('settings',S.settings);LSS('bookingLinks',S.bookingLinks);}
+
+function getDefaultMural(){
+  return [
+    {id:'m1',icon:'📋',title:'Código de Ética CFP',desc:'Resolução CFP nº 010/2005','url':'https://site.cfp.org.br/wp-content/uploads/2012/07/codigo-de-etica-psicologia.pdf'},
+    {id:'m2',icon:'📊',title:'Tabela de Honorários SUGESTÃO',desc:'Referência de valores por região','url':'#'},
+    {id:'m3',icon:'📄',title:'Modelo de Contrato Terapêutico',desc:'Documento padrão para novos pacientes','url':'#'},
+    {id:'m4',icon:'⚖️',title:'Resoluções CFP',desc:'Legislação atualizada do exercício profissional','url':'https://site.cfp.org.br/legislacao/'},
+    {id:'m5',icon:'📞',title:'CVV — Centro de Valorização da Vida',desc:'Apoio emocional gratuito: 188','url':'https://www.cvv.org.br/'},
+  ];
+}
+
+function saveState(){
+  LSS('patients',S.patients);
+  LSS('appointments',S.appointments);
+  LSS('settings',S.settings);
+  LSS('bookingLinks',S.bookingLinks);
+  LSS('notes',S.notes);
+  LSS('muralItems',S.muralItems);
+}
 
 // ==============================
 // HELPERS
@@ -239,48 +368,150 @@ function saveState(){LSS('patients',S.patients);LSS('appointments',S.appointment
 const uid=()=>Math.random().toString(36).slice(2,8)+Date.now().toString(36);
 const today=()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())};
 const fmtDate=d=>d.toLocaleDateString('pt-BR');
+const fmtDateTime=d=>d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 const fmtTime=d=>d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-const weekStart=(offset=0)=>{const d=new Date();d.setDate(d.getDate()+d.getDay()*0+d.getDay());d.setDate(d.getDate()-d.getDay()+1+offset*7);return d};
+const weekStart=(offset=0)=>{const d=new Date();d.setDate(d.getDate()-d.getDay()+1+offset*7);d.setHours(0,0,0,0);return d};
 const addDays=(d,n)=>{const r=new Date(d);r.setDate(r.getDate()+n);return r};
 const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const toast=(msg,type='ok')=>{const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)};
-const weekDays=()=>{const s=weekStart(curWeek);return Array.from({length:5},(_,i)=>{const d=addDays(s,i);return{date:d,label:d.toLocaleDateString('pt-BR',{weekday:'short'})+' '+d.getDate(),full:d.toLocaleDateString('pt-BR')}})}; 
+const toast=(msg,type='ok')=>{const t=document.createElement('div');t.className='toast '+(type==='err'?'err':type==='warn'?'warn':'ok');t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)};
+const weekDays=(offset=0)=>{const s=weekStart(offset);return Array.from({length:5},(_,i)=>{const d=addDays(s,i);return{date:d,label:d.toLocaleDateString('pt-BR',{weekday:'short'}).slice(0,3)+' '+d.getDate(),full:d.toLocaleDateString('pt-BR')}})};
 
 function monthLabel(offset){
   const s=weekStart(offset);const e=addDays(s,4);
   const same=s.getMonth()===e.getMonth()&&s.getFullYear()===e.getFullYear();
   if(same)return s.toLocaleDateString('pt-BR',{month:'long'})+' '+s.getFullYear();
-  return s.toLocaleDateString('pt-BR',{month:'short'})+' '+s.getFullYear()+' - '+e.toLocaleDateString('pt-BR',{month:'short'});
+  return s.toLocaleDateString('pt-BR',{month:'short'})+' - '+e.toLocaleDateString('pt-BR',{month:'short'})+' '+e.getFullYear();
 }
 
 function patientName(id){const p=S.patients.find(x=>x.id===id);return p?p.name:'Paciente removido'}
-
-function timeToMinutes(t){const[m]=t.split(':').map(Number);return m}
-
 function getApptsForDay(d){return S.appointments.filter(a=>{const ad=new Date(a.date);return sameDay(ad,d)&&a.status!=='cancelled'})}
 
 // ==============================
 // WHATSAPP & GCAL
 // ==============================
-function waLink(phone,msg){const p=phone.replace(/\D/g,'');return p?`https://wa.me/55${p}?text=${encodeURIComponent(msg)}`:''}
+function waLink(phone,msg){
+  if(!phone)return '';
+  const p=phone.replace(/\D/g,'');
+  return p?`https://wa.me/55${p}?text=${encodeURIComponent(msg)}`:'';
+}
 
-function gcalLink(title,dateStr,timeStr,desc){
-  const d=new Date(dateStr);const[t]=timeStr.split(':').map(Number);
-  d.setHours(t,0,0,0);const end=new Date(d);end.setMinutes(d.getMinutes()+S.settings.duration);
+function waLinkPatient(phone,msg){
+  return waLink(phone,msg);
+}
+
+function gcalLink(title,dateStr,timeStr,desc,dur){
+  const d=new Date(dateStr);
+  const [h,m]=timeStr.split(':').map(Number);
+  d.setHours(h,m||0,0,0);
+  const end=new Date(d);
+  end.setMinutes(d.getMinutes()+(dur||50));
   const fmt=d=>d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(d)}/${fmt(end)}&details=${encodeURIComponent(desc||'')}`;
+}
+
+function sendWhatsApp(phone,msg){
+  const link=waLink(phone,msg);
+  if(!link){toast('Paciente sem WhatsApp cadastrado','err');return}
+  window.open(link,'_blank');
+}
+
+function sendWAMessage(pid,type){
+  const p=S.patients.find(x=>x.id===pid);
+  if(!p||!p.phone){toast('Paciente sem WhatsApp','err');return}
+  const apps=S.appointments.filter(a=>a.patientId===pid).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const last=apps[0];
+  let msg;
+  if(type==='confirm'&&last){
+    msg=S.settings.msgConfirm.replace('{nome}',p.name).replace('{data}',fmtDate(new Date(last.date))).replace('{hora}',last.time);
+  }else if(type==='remind'&&last){
+    msg=S.settings.msgRemind.replace('{nome}',p.name).replace('{data}',fmtDate(new Date(last.date))).replace('{hora}',last.time);
+  }else{
+    msg='Olá '+p.name+'! Tudo bem?';
+  }
+  sendWhatsApp(p.phone,msg);
+}
+
+// ==============================
+// PATTERN ANALYSIS ENGINE
+// ==============================
+function analyzePatterns(){
+  const patterns=[];
+  const diasSem=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  // Por paciente: detectar horário preferencial
+  S.patients.forEach(p=>{
+    const apps=S.appointments.filter(a=>a.patientId===p.id&&a.status!=='cancelled')
+      .sort((a,b)=>new Date(a.date)-new Date(b.date));
+    if(apps.length<3)return;
+    const slots={};
+    apps.forEach(a=>{
+      const d=new Date(a.date);
+      const key=diasSem[d.getDay()]+'_'+a.time;
+      slots[key]=(slots[key]||0)+1;
+    });
+    const best=Object.entries(slots).sort((a,b)=>b[1]-a[1])[0];
+    if(best&&best[1]>=3){
+      const [dia,hora]=best[0].split('_');
+      const total=apps.length;
+      const pct=Math.round(best[1]/total*100);
+      const firstDate=new Date(apps[0].date);
+      const monthsAgo=Math.floor((Date.now()-firstDate.getTime())/(30*24*60*60*1000));
+      patterns.push({type:'patient',patientId:p.id,name:p.name,dia,hora,pct,count:best[1],total,months:monthsAgo});
+    }
+  });
+
+  // Por horário: quais horários mais ocupados
+  const hourCount={};
+  S.appointments.filter(a=>a.status!=='cancelled').forEach(a=>{
+    const d=new Date(a.date);
+    const key=diasSem[d.getDay()]+'_'+a.time;
+    hourCount[key]=(hourCount[key]||0)+1;
+  });
+  const sortedHours=Object.entries(hourCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const peakHours=sortedHours.map(([k,v])=>{
+    const [dia,hora]=k.split('_');
+    return{dia,hora,count:v};
+  });
+
+  // Sugestões de horários livres
+  const sugestoes=[];
+  const now=new Date();
+  for(let w=0;w<4;w++){
+    const s=weekStart(w);
+    for(let d=0;d<5;d++){
+      const day=addDays(s,d);
+      if(day<now)continue;
+      for(let h=8;h<=18;h+=1){
+        const time=String(h).padStart(2,'0')+':00';
+        const hasApp=S.appointments.some(a=>{
+          const ad=new Date(a.date);
+          return sameDay(ad,day)&&a.time===time&&a.status!=='cancelled';
+        });
+        if(!hasApp){
+          sugestoes.push({date:day,time,dia:diasSem[day.getDay()]});
+        }
+      }
+    }
+  }
+
+  return {patterns,peakHours,sugestoes};
 }
 
 // ==============================
 // NAVIGATION
 // ==============================
 const TABS=[
+  {id:'dashboard',icon:'★',label:'Dashboard'},
   {id:'agenda',icon:'📅',label:'Agenda'},
   {id:'patients',icon:'👥',label:'Pacientes'},
   {id:'sessions',icon:'📋',label:'Sessões'},
   {id:'finance',icon:'💰',label:'Financeiro'},
+  {id:'honorarios',icon:'📄',label:'Honorários'},
+  {id:'insights',icon:'📊',label:'Insights'},
   {id:'booklinks',icon:'🔗',label:'Links'},
+  {id:'mural',icon:'📌',label:'Mural'},
+  {id:'notes',icon:'📝',label:'Notas'},
   {id:'settings',icon:'⚙️',label:'Config'},
 ];
 
@@ -294,24 +525,93 @@ function switchTab(tab){
 }
 
 function renderTab(){
-  const mh=document.getElementById('mh');
   const tab=TABS.find(t=>t.id===curTab);
-  document.getElementById('mhTitle').textContent=tab.label;
+  document.getElementById('mhTitle').innerHTML='<span class="star-mini">★</span>'+esc(tab.label);
   document.getElementById('mhActions').innerHTML='';
   const c=document.getElementById('content');
-  if(curTab==='agenda')renderAgenda(c);
+  if(curTab==='dashboard')renderDashboard(c);
+  else if(curTab==='agenda')renderAgenda(c);
   else if(curTab==='patients')renderPatients(c);
   else if(curTab==='sessions')renderSessions(c);
   else if(curTab==='finance')renderFinance(c);
+  else if(curTab==='honorarios')renderHonorarios(c);
+  else if(curTab==='insights')renderInsights(c);
   else if(curTab==='booklinks')renderBookLinks(c);
+  else if(curTab==='mural')renderMural(c);
+  else if(curTab==='notes')renderNotes(c);
   else if(curTab==='settings')renderSettings(c);
+}
+
+// ==============================
+// DASHBOARD
+// ==============================
+function renderDashboard(c){
+  const now=new Date();
+  const todayApps=S.appointments.filter(a=>{const d=new Date(a.date);return sameDay(d,now)&&a.status!=='cancelled'});
+  const todayCount=todayApps.length;
+  const monthApps=S.appointments.filter(a=>{const d=new Date(a.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()});
+  const monthTotal=monthApps.length;
+  const monthPaid=monthApps.filter(a=>a.payment==='paid').length*S.settings.sessionValue;
+  const monthPending=monthApps.filter(a=>a.payment==='pending').length*S.settings.sessionValue;
+  const monthCanceled=monthApps.filter(a=>a.status==='cancelled').length;
+  const patientCount=S.patients.length;
+  const retencao=patientCount>0?Math.round(S.patients.filter(p=>S.appointments.some(a=>a.patientId===p.id&&a.status!=='cancelled')).length/patientCount*100):0;
+
+  // Insights rápidos
+  const {patterns}=analyzePatterns();
+  const topPatterns=patterns.slice(0,3);
+
+  // Próximas consultas
+  const upcoming=[...S.appointments].filter(a=>{
+    const d=new Date(a.date);
+    return d>=now&&a.status!=='cancelled';
+  }).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5);
+
+  // Hoje resumo
+  const nowH=now.getHours();
+  const nextApps=todayApps.filter(a=>{
+    const h=parseInt(a.time.split(':')[0]);
+    return h>=nowH;
+  }).sort((a,b)=>a.time.localeCompare(b.time));
+
+  c.innerHTML=`
+<div class="qactions">
+  <button onclick="switchTab('agenda')">📅 Ver agenda</button>
+  <button onclick="openNewApptModal()">➕ Nova consulta</button>
+  <button onclick="openPatientModal()">👤 Novo paciente</button>
+  <button onclick="switchTab('insights')">📊 Análises</button>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-c"><div class="stat-l">Consultas hoje</div><div class="stat-v" style="color:var(--accent)">${todayCount}</div></div>
+  <div class="stat-c"><div class="stat-l">Pacientes ativos</div><div class="stat-v" style="color:var(--text)">${patientCount}</div></div>
+  <div class="stat-c"><div class="stat-l">Faturamento (mês)</div><div class="stat-v" style="color:var(--green)">R$ ${monthPaid.toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">Retenção</div><div class="stat-v" style="color:var(--green)">${retencao}%</div></div>
+</div>
+
+${topPatterns.length?`<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">★ Padrões detectados</div>
+${topPatterns.map(p=>`<div class="insight-card"><div class="icn">🔄</div><div class="txt"><strong>${esc(p.name)}</strong> — ${p.dia} ${p.hora} (${p.pct}% das ${p.count} sessões há ${p.months} meses)</div></div>`).join('')}</div>`:''}
+
+${nextApps.length?`<div class="card"><div class="card-h"><h3>★ Próximas hoje</h3></div>
+${nextApps.map(a=>{
+  const p=patientName(a.patientId);
+  const phone=S.patients.find(x=>x.id===a.patientId)?.phone;
+  return `<div class="pc"><div class="pc-av">${p.charAt(0)}</div><div class="pc-info"><div class="name">${esc(p)}</div><div class="meta">${a.time} · ${a.status==='confirmed'?'✅ Confirmada':'⏳ Pendente'}</div></div><div class="pc-actions">${phone?`<a href="${waLink(phone,S.settings.msgRemind.replace('{nome}',p).replace('{data}',fmtDate(now)).replace('{hora}',a.time))}" target="_blank" class="btn-icon whatsapp" title="Lembrar">📱</a>`:''}</div></div>`;
+}).join('')}</div>`:todayApps.length===0?'<div class="card" style="text-align:center;padding:30px;color:var(--text2)">★ Nenhuma consulta hoje. Aproveite para revisar a agenda! ⚽</div>':''}
+
+${upcoming.length?`<div class="card"><div class="card-h"><h3>★ Próximos dias</h3></div>
+<table><tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Status</th></tr>
+${upcoming.map(a=>`<tr onclick="openApptModal('${a.id}')" style="cursor:pointer"><td>${fmtDate(new Date(a.date))}</td><td>${a.time}</td><td>${esc(patientName(a.patientId))}</td><td><span class="badge badge-${a.status==='confirmed'?'green':a.status==='pending'?'amber':'red'}">${a.status==='confirmed'?'Confirmada':'Pendente'}</span></td></tr>`).join('')}
+</table></div>`:''}
+
+<div style="font-size:11px;color:var(--text2);text-align:center;padding:12px">★ ⚽ Botafogo — Alma, Raça e Fogo</div>`;
 }
 
 // ==============================
 // AGENDA
 // ==============================
 function renderAgenda(c){
-  const days=weekDays();
+  const days=weekDays(curWeek);
   c.innerHTML=`
 <div class="ag-header">
   <h3>${monthLabel(curWeek)}</h3>
@@ -333,7 +633,7 @@ function renderAgenda(c){
       slots.push(`<div class="ag-time">${String(h).padStart(2,'0')}:00</div>`);
       for(let d=0;d<5;d++){
         const day=addDays(weekStart(curWeek),d);
-        const apps=getApptsForDay(day).filter(a=>{const ah=timeToMinutes(a.time);return ah===h});
+        const apps=getApptsForDay(day).filter(a=>{const ah=parseInt(a.time.split(':')[0]);return ah===h});
         const empty=apps.length===0;
         slots.push(`<div class="ag-col" style="min-height:40px">${empty?'<div class="ag-empty">--</div>':apps.map(a=>{
           const p=patientName(a.patientId);
@@ -348,11 +648,13 @@ function renderAgenda(c){
   <button class="primary sm" onclick="openNewApptModal()">+ Nova Consulta</button>
 </div>`;
 
-  // Make empty slots clickable
   document.querySelectorAll('.ag-empty').forEach(el=>{
     const col=el.closest('.ag-col');
-    const dayI=Array.from(col.parentElement.children).indexOf(col);
-    const day=addDays(weekStart(curWeek),(dayI-1)%5);
+    const children=Array.from(col.parentElement.children);
+    const idx=children.indexOf(col);
+    const dayI=(idx-1)%5;
+    const gridOffset=Math.floor((idx-1)/5);
+    const day=addDays(weekStart(curWeek),dayI);
     el.style.cursor='pointer';
     el.onclick=()=>openQuickBook(day);
   });
@@ -361,8 +663,22 @@ function renderAgenda(c){
 function openQuickBook(day){
   const m=document.getElementById('modal');
   const pOpts=S.patients.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  // Pattern suggestion
+  const patSuggest=S.patients.map(p=>{
+    const apps=S.appointments.filter(a=>a.patientId===p.id&&a.status!=='cancelled');
+    if(apps.length<2)return '';
+    const diasSem=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const dName=diasSem[day.getDay()];
+    const sameDayApps=apps.filter(a=>{const ad=new Date(a.date);return ad.getDay()===day.getDay()});
+    if(sameDayApps.length<2)return '';
+    const times={};sameDayApps.forEach(a=>{times[a.time]=(times[a.time]||0)+1});
+    const best=Object.entries(times).sort((a,b)=>b[1]-a[1])[0];
+    if(best)return `<div style="font-size:12px;color:var(--accent);margin-bottom:8px">★ ${esc(p.name)} costuma agendar ${dName} às ${best[0]}</div>`;
+    return '';
+  }).filter(Boolean).join('');
   m.innerHTML=`
 <div class="modal-h"><h3>Nova Consulta — ${fmtDate(day)}</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+${patSuggest}
 <div class="form-g">
   <label>Paciente</label>
   <select id="qbP">${pOpts||'<option value="">Nenhum paciente cadastrado</option>'}</select>
@@ -386,15 +702,21 @@ function quickBookSave(){
   if(!pid){toast('Selecione um paciente','err');return}
   const time=document.getElementById('qbT').value;
   const status=document.getElementById('qbS').value;
-  S.appointments.push({id:uid(),patientId:pid,date:window._qbDay.toISOString(),time,duration:S.settings.duration,status,payment:'pending',notes:'',createdAt:new Date().toISOString()});
-  saveState();closeModal();toast('Consulta agendada');renderTab();
+  S.appointments.push({id:uid(),patientId:pid,date:window._qbDay.toISOString().split('T')[0],time,duration:S.settings.duration,status,payment:'pending',notes:'',createdAt:new Date().toISOString()});
+  saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
 
 // ==============================
 // PATIENTS
 // ==============================
 let pSearch='';
+let pSubTab='list';
 function renderPatients(c){
+  if(pSubTab==='list')renderPatientList(c);
+  else renderPatientDetail(c);
+}
+
+function renderPatientList(c){
   const list=S.patients.filter(p=>!pSearch||p.name.toLowerCase().includes(pSearch.toLowerCase()));
   c.innerHTML=`
 <div class="card-h"><h3>Pacientes (${S.patients.length})</h3><button class="primary sm" onclick="openPatientModal()">+ Novo</button></div>
@@ -402,21 +724,141 @@ function renderPatients(c){
 ${list.length?list.map(p=>{
   const apps=S.appointments.filter(a=>a.patientId===p.id);
   const total=apps.length;
+  const confirmed=apps.filter(a=>a.status==='confirmed').length;
   const last=apps.length?apps.sort((a,b)=>new Date(b.date)-new Date(a.date))[0]:null;
-  return `<div class="pc">
+  const noShow=apps.filter(a=>a.status==='cancelled').length;
+  return `<div class="pc" onclick="openPatientDetail('${p.id}')">
     <div class="pc-av">${p.name.charAt(0).toUpperCase()}</div>
     <div class="pc-info">
       <div class="name">${esc(p.name)}</div>
-      <div class="meta">${p.phone?'📞 '+p.phone:''} ${p.phone&&p.email?' · ':''} ${p.email?'✉️ '+p.email:''} · ${total} sessões ${last?' · Últ: '+fmtDate(new Date(last.date)):''}</div>
+      <div class="meta">${p.phone?'📱 '+p.phone:''} ${p.email?' · ✉️':''} · ${total} sessões · ${confirmed} confirmadas ${noShow?`· ${noShow} faltas`:''}</div>
     </div>
+    <div class="pc-actions">
+      ${p.phone?`<a href="${waLink(p.phone,'')}" target="_blank" class="btn-icon whatsapp" title="WhatsApp" onclick="event.stopPropagation()">📱</a>`:''}
+      <button class="btn-icon" onclick="event.stopPropagation();openPatientModal('${p.id}')" title="Editar">✏️</button>
+    </div>
+  </div>`;
+}).join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">★ Nenhum paciente cadastrado ainda</div>'}
+  <div style="margin-top:12px"><button class="primary sm" onclick="openPatientModal()">+ Novo Paciente</button></div>`;
+}
+
+function openPatientDetail(id){
+  pSubTab=id;
+  renderTab();
+}
+
+function renderPatientDetail(c){
+  const p=S.patients.find(x=>x.id===pSubTab);
+  if(!p){pSubTab='list';renderTab();return}
+  const apps=S.appointments.filter(a=>a.patientId===p.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const total=apps.length;
+  const confirmed=apps.filter(a=>a.status==='confirmed').length;
+  const canceled=apps.filter(a=>a.status==='cancelled').length;
+  const pendingPay=apps.filter(a=>a.payment==='pending');
+  const totalDevido=pendingPay.length*S.settings.sessionValue;
+
+  // Pattern analysis for this patient
+  const diasSem=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const freq={};
+  apps.filter(a=>a.status!=='cancelled').forEach(a=>{
+    const d=new Date(a.date);
+    const key=diasSem[d.getDay()]+' '+a.time;
+    freq[key]=(freq[key]||0)+1;
+  });
+  const bestFreq=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,2);
+
+  c.innerHTML=`
+<div style="margin-bottom:12px"><button class="outline sm" onclick="pSubTab='list';renderTab()">← Voltar</button></div>
+<div class="card">
+  <div class="card-h"><h3>${esc(p.name)}</h3>
     <div class="pc-actions">
       ${p.phone?`<a href="${waLink(p.phone,'')}" target="_blank" class="btn-icon whatsapp" title="WhatsApp">📱</a>`:''}
       <button class="btn-icon" onclick="openPatientModal('${p.id}')" title="Editar">✏️</button>
-      <button class="btn-icon" onclick="deletePatient('${p.id}')" title="Remover" style="color:var(--red)">🗑️</button>
+      <button class="btn-icon" onclick="sendWAMessage('${p.id}','confirm')" title="Enviar confirmação">✅</button>
     </div>
-  </div>`;
-}).join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhum paciente cadastrado</div>'}
-  <div style="margin-top:12px"><button class="primary sm" onclick="openPatientModal()">+ Novo Paciente</button></div>`;
+  </div>
+  <div class="form-row" style="margin-bottom:8px">
+    <div><span style="color:var(--text2);font-size:12px">📱 </span>${p.phone||'—'}</div>
+    <div><span style="color:var(--text2);font-size:12px">✉️ </span>${p.email||'—'}</div>
+  </div>
+  ${p.notes?`<div style="font-size:13px;color:var(--text2);margin-top:8px;padding:8px;background:var(--bg3);border-radius:var(--r2)">📋 ${esc(p.notes)}</div>`:''}
+</div>
+
+<div class="stat-grid">
+  <div class="stat-c"><div class="stat-l">Total sessões</div><div class="stat-v">${total}</div></div>
+  <div class="stat-c"><div class="stat-l">Confirmadas</div><div class="stat-v" style="color:var(--green)">${confirmed}</div></div>
+  <div class="stat-c"><div class="stat-l">Faltas</div><div class="stat-v" style="color:var(--red)">${canceled}</div></div>
+  <div class="stat-c"><div class="stat-l">A pagar</div><div class="stat-v" style="color:var(--amber)">R$ ${totalDevido.toFixed(2)}</div></div>
+</div>
+
+${bestFreq.length?`<div class="card"><div class="card-h"><h3>★ Padrão de horário</h3></div>
+${bestFreq.map(([k,v])=>`<div class="pattern-card"><div class="p-day">${k.split(' ')[0].slice(0,3)}</div><div class="p-info"><div class="p-detail">${k.split(' ')[1]} — ${v}x em ${total} sessões</div></div><div class="p-pct">${Math.round(v/total*100)}%</div></div>`).join('')}
+</div>`:''}
+
+${apps.length?`<div class="card"><div class="card-h"><h3>📋 Evolução Clínica</h3>
+  <button class="outline sm" onclick="addEvolucao('${p.id}')">+ Anotação</button></div>
+${apps.filter(a=>a.notes).slice(0,10).map(a=>`<div class="tl-item"><div class="tl-date">${fmtDate(new Date(a.date))} às ${a.time} · <span class="badge badge-${a.status==='confirmed'?'green':'red'}">${a.status==='confirmed'?'Presente':'Faltou'}</span></div><div class="tl-text">${esc(a.notes)}</div>
+<div style="display:flex;gap:6px;margin-top:6px">
+  <a href="${waLink(p.phone,S.settings.msgConfirm.replace('{nome}',p.name).replace('{data}',fmtDate(new Date(a.date))).replace('{hora}',a.time))}" target="_blank" class="btn-icon whatsapp sm" title="WhatsApp">📱</a>
+  <a href="${gcalLink('Sessão - '+p.name,a.date,a.time,'',a.duration||S.settings.duration)}" target="_blank" class="btn-icon gcal sm" title="Google Calendar">📅</a>
+</div></div>`).join('')}
+${apps.filter(a=>!a.notes).length?`<div style="font-size:12px;color:var(--text2);margin-top:8px">${apps.filter(a=>!a.notes).length} sessões sem anotação</div>`:''}
+</div>`:'<div class="card" style="text-align:center;padding:30px;color:var(--text2)">Nenhuma sessão registrada ainda</div>'}
+
+<div style="margin-top:12px;display:flex;gap:8px">
+  <button class="primary sm" onclick="openNewApptForPatient('${p.id}')">➕ Agendar sessão</button>
+  <button class="outline sm" onclick="generateRecibo('${p.id}')">📄 Recibo</button>
+</div>`;
+}
+
+function addEvolucao(pid){
+  const m=document.getElementById('modal');
+  m.innerHTML=`
+<div class="modal-h"><h3>Anotação de Evolução</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+<div class="form-g"><label>Anotação clínica</label>
+<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+  <div class="temp-item" onclick="const ta=document.getElementById('evNotes');ta.value+='Estado geral: '">Estado geral</div>
+  <div class="temp-item" onclick="const ta=document.getElementById('evNotes');ta.value+='Técnica: '">Técnica</div>
+  <div class="temp-item" onclick="const ta=document.getElementById('evNotes');ta.value+='Evolução: '">Evolução</div>
+  <div class="temp-item" onclick="const ta=document.getElementById('evNotes');ta.value+='Plano: '">Plano</div>
+  <div class="temp-item" onclick="const ta=document.getElementById('evNotes');ta.value+='Riscos: '">Riscos</div>
+</div>
+<textarea id="evNotes" rows="5" placeholder="Descreva a evolução do paciente..."></textarea></div>
+<div class="form-actions">
+  <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+  <button class="primary" onclick="saveEvolucao('${pid}')">Salvar</button>
+</div>`;
+  document.getElementById('modalO').classList.add('show');
+}
+
+function saveEvolucao(pid){
+  const notes=document.getElementById('evNotes').value.trim();
+  if(!notes){toast('Escreva a anotação','err');return}
+  S.appointments.push({id:uid(),patientId:pid,date:today().toISOString().split('T')[0],time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),duration:S.settings.duration,status:'confirmed',payment:'pending',notes,createdAt:new Date().toISOString(),isNote:true});
+  saveState();closeModal();toast('Anotação salva ★');renderTab();
+}
+
+function openNewApptForPatient(pid){
+  const p=S.patients.find(x=>x.id===pid);
+  if(!p)return;
+  const m=document.getElementById('modal');
+  m.innerHTML=`
+<div class="modal-h"><h3>Agendar — ${esc(p.name)}</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+<div class="form-row">
+  <div class="form-g"><label>Data</label><input type="date" id="naD" value="${today().toISOString().split('T')[0]}"></div>
+  <div class="form-g"><label>Horário</label><input type="time" id="naT" value="08:00"></div>
+</div>
+<div class="form-g"><label>Status</label><select id="naS"><option value="confirmed">Confirmada</option><option value="pending">Pendente</option></select></div>
+<div class="form-actions">
+  <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+  <button class="primary" onclick="newApptForPatientSave('${pid}')">Agendar</button>
+</div>`;
+  document.getElementById('modalO').classList.add('show');
+}
+
+function newApptForPatientSave(pid){
+  S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',notes:'',createdAt:new Date().toISOString()});
+  saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
 
 function openPatientModal(id){
@@ -443,7 +885,7 @@ function savePatient(id){
   const data={name:n,phone:document.getElementById('pPhone').value.trim(),email:document.getElementById('pEmail').value.trim(),notes:document.getElementById('pNotes').value.trim()};
   if(id){Object.assign(S.patients.find(x=>x.id===id),data)}
   else{S.patients.push({id:uid(),...data,createdAt:new Date().toISOString()})}
-  saveState();closeModal();toast(id?'Paciente atualizado':'Paciente cadastrado');renderTab();
+  saveState();closeModal();toast(id?'Paciente atualizado':'Paciente cadastrado ★');renderTab();
 }
 
 function deletePatient(id){
@@ -467,18 +909,20 @@ function renderSessions(c){
   ${[{id:'all',l:'Todas'},{id:'today',l:'Hoje'},{id:'week',l:'Esta Semana'},{id:'pending',l:'Pendentes'}].map(x=>`<div class="pill${sFilter===x.id?' act':''}" onclick="sFilter='${x.id}';renderTab()">${x.l}</div>`).join('')}
 </div>
 <div style="margin-bottom:12px;font-size:13px;color:var(--text2)">${apps.length} consulta${apps.length!==1?'s':''}</div>
-<table>${apps.length?`<tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Status</th><th>Pgto</th><th></th></tr>${apps.map(a=>{
+<table>${apps.length?`<tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Status</th><th>Pgto</th><th>Ações</th></tr>${apps.map(a=>{
   const p=patientName(a.patientId);
+  const phone=S.patients.find(x=>x.id===a.patientId)?.phone;
   return `<tr onclick="openApptModal('${a.id}')" style="cursor:pointer">
     <td>${fmtDate(new Date(a.date))}</td><td>${a.time}</td>
     <td>${esc(p)}</td>
     <td><span class="badge badge-${a.status==='confirmed'?'green':a.status==='cancelled'?'red':'amber'}">${a.status==='confirmed'?'Confirmada':a.status==='cancelled'?'Cancelada':'Pendente'}</span></td>
     <td><span class="badge badge-${a.payment==='paid'?'green':a.payment==='pending'?'amber':'red'}">${a.payment==='paid'?'Pago':a.payment==='pending'?'Pendente':'Isento'}</span></td>
-    <td style="text-align:right">
-      <a href="${gcalLink('Consulta - '+p,a.date,a.time,a.notes)}" target="_blank" class="btn-icon gcal" title="Google Calendar">📅</a>
+    <td style="text-align:right;white-space:nowrap">
+      <a href="${gcalLink('Consulta - '+p,a.date,a.time,a.notes,a.duration||S.settings.duration)}" target="_blank" class="btn-icon gcal" title="Google Calendar" onclick="event.stopPropagation()">📅</a>
+      ${phone?`<a href="${waLink(phone,S.settings.msgConfirm.replace('{nome}',p).replace('{data}',fmtDate(new Date(a.date))).replace('{hora}',a.time))}" target="_blank" class="btn-icon whatsapp" title="WhatsApp" onclick="event.stopPropagation()">📱</a>`:''}
     </td>
   </tr>`;
-}).join('')}`:'<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text2)">Nenhuma consulta encontrada</td></tr>'}</table>`;
+}).join('')}`:'<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text2)">★ Nenhuma consulta encontrada</td></tr>'}</table>`;
 }
 
 // ==============================
@@ -490,10 +934,10 @@ function openApptModal(id){
   const p=S.patients.find(x=>x.id===a.patientId);
   const m=document.getElementById('modal');
   m.innerHTML=`
-<div class="modal-h"><h3>Consulta — ${esc(p?.name||'?')}</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
+<div class="modal-h"><h3>${esc(p?.name||'?')} — ${fmtDate(new Date(a.date))} ${a.time}</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
 <div class="form-row">
-  <div class="form-g"><label>Data</label><input type="date" id="aDate" value="${a.date.split('T')[0]}"></div>
-  <div class="form-g"><label>Horário</label><input type="time" id="aTime" value="${a.time}"></div>
+  <div class="form-g"><label>Data</label><input type="date" id="aDate" value="${a.date}"></div>
+  <div class="form-g"><label>Horario</label><input type="time" id="aTime" value="${a.time}"></div>
 </div>
 <div class="form-row">
   <div class="form-g"><label>Status</label>
@@ -503,19 +947,26 @@ function openApptModal(id){
     <select id="aPay"><option value="pending" ${a.payment==='pending'?'selected':''}>Pendente</option><option value="paid" ${a.payment==='paid'?'selected':''}>Pago</option><option value="free" ${a.payment==='free'?'selected':''}>Isento</option></select>
   </div>
 </div>
-<div class="form-g"><label>Anotações clínicas</label>
-  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
-    <div class="temp-item" onclick="insertTemplate('Estado geral:')">Estado geral</div>
-    <div class="temp-item" onclick="insertTemplate('Técnica utilizada:')">Técnica</div>
-    <div class="temp-item" onclick="insertTemplate('Evolução:')">Evolução</div>
-    <div class="temp-item" onclick="insertTemplate('Plano:')">Plano</div>
-  </div>
-  <textarea id="aNotes" rows="5">${esc(a.notes||'')}</textarea>
+<div class="form-g"><label>Duracao (min)</label><input type="number" id="aDur" value="${a.duration||S.settings.duration}" min="30" max="120" step="10"></div>
+<div class="form-g"><label>Anotacoes clinicas</label>
+<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+  <div class="temp-item" onclick="insertATemplate('Estado geral: ')">Estado geral</div>
+  <div class="temp-item" onclick="insertATemplate('Tecnica: ')">Tecnica</div>
+  <div class="temp-item" onclick="insertATemplate('Evolucao: ')">Evolucao</div>
+  <div class="temp-item" onclick="insertATemplate('Plano: ')">Plano</div>
+  <div class="temp-item" onclick="insertATemplate('Riscos: ')">Riscos</div>
+  <div class="temp-item" onclick="insertATemplate('Tema: ')">Tema</div>
+</div>
+<textarea id="aNotes" rows="5">${esc(a.notes||'')}</textarea></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:8px;background:var(--bg3);border-radius:var(--r2)">
+  ${p?.phone?`<a href="${waLink(p.phone,S.settings.msgConfirm.replace('{nome}',p.name).replace('{data}',fmtDate(new Date(a.date))).replace('{hora}',a.time))}" target="_blank" class="primary sm" style="display:inline-flex;align-items:center;gap:4px;text-decoration:none">📱 Confirmar</a>
+  <a href="${waLink(p.phone,S.settings.msgRemind.replace('{nome}',p.name).replace('{data}',fmtDate(new Date(a.date))).replace('{hora}',a.time))}" target="_blank" class="outline sm" style="display:inline-flex;align-items:center;gap:4px;text-decoration:none">📱 Lembrar</a>
+  <a href="${waLink(p.phone,S.settings.msgCancel.replace('{nome}',p.name).replace('{data}',fmtDate(new Date(a.date))).replace('{hora}',a.time))}" target="_blank" class="outline sm" style="display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:var(--red)">📱 Cancelar</a>`:''}
+  <a href="${gcalLink('Sessao'+(p?' - '+p.name:''),a.date,a.time,a.notes,a.duration||S.settings.duration)}" target="_blank" class="outline sm" style="display:inline-flex;align-items:center;gap:4px;text-decoration:none">📅 Google Calendar</a>
+  ${S.settings.videoLink?`<a href="${S.settings.videoLink}" target="_blank" class="outline sm" style="display:inline-flex;align-items:center;gap:4px;text-decoration:none">🎥 Teleconsulta</a>`:''}
 </div>
 <div class="form-actions" style="justify-content:space-between">
   <div>
-    ${p?.phone?`<a href="${waLink(p.phone,(S.settings.msgConfirm||'Olá {nome}...').replace('{nome}',p.name).replace('{data}',fmtDate(new Date(a.date))).replace('{hora}',a.time))}" target="_blank" class="btn-icon whatsapp" title="Enviar confirmação WhatsApp">📱</a>`:''}
-    <a href="${gcalLink('Consulta - '+(p?.name||''),a.date,a.time,a.notes)}" target="_blank" class="btn-icon gcal" title="Google Calendar">📅</a>
     <button class="btn-icon" onclick="duplicateAppt('${a.id}')" title="Duplicar">📋</button>
   </div>
   <div style="display:flex;gap:8px">
@@ -524,11 +975,11 @@ function openApptModal(id){
     <button class="btn-ghost" onclick="deleteAppt('${a.id}')" style="color:var(--red)">Excluir</button>
   </div>
 </div>`;
-  window._curApptId=id;
   document.getElementById('modalO').classList.add('show');
 }
 
-function insertTemplate(t){const ta=document.getElementById('aNotes');ta.value+=t+'\n';ta.focus()}
+function insertATemplate(t){const ta=document.getElementById('aNotes');ta.value+=t;ta.focus()}
+function closeModal(){document.getElementById('modalO').classList.remove('show')}
 
 function saveAppt(id){
   const a=S.appointments.find(x=>x.id===id);
@@ -537,21 +988,22 @@ function saveAppt(id){
   a.time=document.getElementById('aTime').value;
   a.status=document.getElementById('aStatus').value;
   a.payment=document.getElementById('aPay').value;
+  a.duration=parseInt(document.getElementById('aDur').value)||S.settings.duration;
   a.notes=document.getElementById('aNotes').value;
-  saveState();closeModal();toast('Consulta atualizada');renderTab();
+  saveState();closeModal();toast('Consulta atualizada ★');renderTab();
 }
 
 function duplicateAppt(id){
   const a=S.appointments.find(x=>x.id===id);
   if(!a)return;
-  const copy={...a,id:uid(),date:new Date().toISOString(),status:'pending',payment:'pending',notes:'',createdAt:new Date().toISOString()};
+  const copy={...a,id:uid(),date:today().toISOString().split('T')[0],status:'pending',payment:'pending',notes:'',createdAt:new Date().toISOString()};
   S.appointments.push(copy);saveState();toast('Consulta duplicada');closeModal();renderTab();
 }
 
 function deleteAppt(id){
   if(!confirm('Excluir esta consulta?'))return;
   S.appointments=S.appointments.filter(x=>x.id!==id);
-  saveState();closeModal();toast('Consulta excluída');renderTab();
+  saveState();closeModal();toast('Consulta excluida');renderTab();
 }
 
 function openNewApptModal(){
@@ -562,7 +1014,7 @@ function openNewApptModal(){
 <div class="form-g"><label>Paciente</label><select id="naP">${S.patients.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div>
 <div class="form-row">
   <div class="form-g"><label>Data</label><input type="date" id="naD" value="${today().toISOString().split('T')[0]}"></div>
-  <div class="form-g"><label>Horário</label><input type="time" id="naT" value="08:00"></div>
+  <div class="form-g"><label>Horario</label><input type="time" id="naT" value="08:00"></div>
 </div>
 <div class="form-g"><label>Status</label><select id="naS"><option value="confirmed">Confirmada</option><option value="pending">Pendente</option></select></div>
 <div class="form-actions">
@@ -575,7 +1027,7 @@ function openNewApptModal(){
 function newApptSave(){
   const pid=document.getElementById('naP').value;
   S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',notes:'',createdAt:new Date().toISOString()});
-  saveState();closeModal();toast('Consulta agendada');renderTab();
+  saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
 
 // ==============================
@@ -588,221 +1040,212 @@ function renderFinance(c){
   const pending=monthApps.filter(a=>a.payment==='pending').length*S.settings.sessionValue;
   const total=monthApps.length;
   const canceled=monthApps.filter(a=>a.status==='cancelled').length;
+  const receitaTotal=monthApps.filter(a=>a.status!=='cancelled'&&a.payment!=='free').length*S.settings.sessionValue;
+  const inadimplencia=receitaTotal>0?Math.round((receitaTotal-paid)/receitaTotal*100):0;
   c.innerHTML=`
 <div class="stat-grid">
-  <div class="stat-c"><div class="stat-l">Faturamento</div><div class="stat-v" style="color:var(--green)}">R$ ${paid.toFixed(2)}</div></div>
-  <div class="stat-c"><div class="stat-l">A Receber</div><div class="stat-v" style="color:var(--amber)}">R$ ${pending.toFixed(2)}</div></div>
-  <div class="stat-c"><div class="stat-l">Sessões</div><div class="stat-v">${total}</div></div>
-  <div class="stat-c"><div class="stat-l">Canceladas</div><div class="stat-v" style="color:var(--red)}">${canceled}</div></div>
+  <div class="stat-c"><div class="stat-l">Faturamento</div><div class="stat-v" style="color:var(--green)">R$ ${paid.toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">A Receber</div><div class="stat-v" style="color:var(--amber)">R$ ${pending.toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">Sessoes</div><div class="stat-v">${total}</div></div>
+  <div class="stat-c"><div class="stat-l">Inadimplencia</div><div class="stat-v" style="color:${inadimplencia>20?'var(--red)':inadimplencia>10?'var(--amber)':'var(--green)'}">${inadimplencia}%</div></div>
 </div>
 <div class="card">
-  <div class="card-h"><h3>Histórico — ${now.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</h3></div>
+  <div class="card-h"><h3>★ Historico</h3><button class="outline sm" onclick="exportCSV()">📥 CSV</button></div>
   <table>
-    <tr><th>Data</th><th>Paciente</th><th>Valor</th><th>Status</th></tr>
+    <tr><th>Data</th><th>Paciente</th><th>Valor</th><th>Status</th><th>Pgto</th></tr>
     ${monthApps.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(a=>{
       const p=patientName(a.patientId);
       return `<tr onclick="openApptModal('${a.id}')" style="cursor:pointer">
         <td>${fmtDate(new Date(a.date))}</td><td>${esc(p)}</td>
-        <td>R$ ${S.settings.sessionValue.toFixed(2)}</td>
+        <td>R$ ${a.payment==='free'?'0,00':S.settings.sessionValue.toFixed(2)}</td>
+        <td><span class="badge badge-${a.status==='confirmed'?'green':a.status==='cancelled'?'red':'amber'}">${a.status==='confirmed'?'Confirmada':a.status==='cancelled'?'Cancelada':'Pendente'}</span></td>
         <td><span class="badge badge-${a.payment==='paid'?'green':a.payment==='pending'?'amber':'red'}">${a.payment==='paid'?'Pago':a.payment==='pending'?'Pendente':'Isento'}</span></td>
       </tr>`;
     }).join('')}
   </table>
-  <div style="margin-top:12px"><button class="outline sm" onclick="exportCSV()">📥 Exportar CSV</button></div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <button class="outline sm" onclick="exportCSV()">📥 CSV</button>
+    <button class="outline sm" onclick="generateRecibo()">📄 Recibo mensal</button>
+  </div>
 </div>`;
 }
 
 function exportCSV(){
-  let csv='Data,Hora,Paciente,Status,Valor\n';
+  let csv='Data,Hora,Paciente,Status,Pagamento,Valor,Anotacoes\\n';
   S.appointments.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(a=>{
     const p=patientName(a.patientId);
-    csv+=`${a.date},${a.time},${p},${a.status},${a.payment==='paid'?S.settings.sessionValue:0}\n`;
+    const v=a.payment==='paid'?S.settings.sessionValue:a.payment==='free'?0:0;
+    csv+=`${a.date},${a.time},"${p}",${a.status},${a.payment},${v},"${(a.notes||'').replace(/"/g,'""')}"\\n`;
   });
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='psi-financeiro.csv';a.click();
-  toast('CSV exportado');
+  const a2=document.createElement('a');a2.href=URL.createObjectURL(blob);a2.download='psi-financeiro.csv';a2.click();
+  toast('CSV exportado ★');
+}
+
+// ==============================
+// HONORARIOS
+// ==============================
+function renderHonorarios(c){
+  const now2=new Date();const month2=now2.getMonth();const year2=now2.getFullYear();
+  const monthApps2=S.appointments.filter(a=>{const d=new Date(a.date);return d.getMonth()===month2&&d.getFullYear()===year2&&a.status!=='cancelled'});
+  const porPaciente={};
+  monthApps2.forEach(a=>{
+    if(!porPaciente[a.patientId])porPaciente[a.patientId]={count:0,paid:0,pending:0};
+    porPaciente[a.patientId].count++;
+    if(a.payment==='paid')porPaciente[a.patientId].paid++;
+    else if(a.payment==='pending')porPaciente[a.patientId].pending++;
+  });
+  c.innerHTML=`
+<div class="card-h"><h3>★ Honorarios — ${now2.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</h3>
+  <button class="outline sm" onclick="generateRecibo()">📄 Recibo</button></div>
+<div class="stat-grid">
+  <div class="stat-c"><div class="stat-l">Receita total</div><div class="stat-v" style="color:var(--green)">R$ ${(monthApps2.filter(a=>a.payment==='paid').length*S.settings.sessionValue).toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">Valor por sessao</div><div class="stat-v" style="color:var(--accent)">R$ ${S.settings.sessionValue.toFixed(2)}</div></div>
+</div>
+${Object.entries(porPaciente).map(([pid,data])=>{
+  const p2=S.patients.find(x=>x.id===pid);
+  const totalValor=data.count*S.settings.sessionValue;
+  const recebido=data.paid*S.settings.sessionValue;
+  const pendente2=data.pending*S.settings.sessionValue;
+  return `<div class="recibo-box"><div class="rec-linha"><span>${esc(p2?.name||'?')}</span><span>${data.count} sessoes</span></div>
+    <div class="rec-linha"><span style="color:var(--text2)">Recebido</span><span style="color:var(--green)">R$ ${recebido.toFixed(2)}</span></div>
+    <div class="rec-linha"><span style="color:var(--text2)">Pendente</span><span style="color:var(--amber)">R$ ${pendente2.toFixed(2)}</span></div>
+    <div class="rec-total">Total: R$ ${totalValor.toFixed(2)}</div></div>`;
+}).join('')||'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhuma sessao no mes</div>'}
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="outline sm" onclick="generateRecibo()">📄 Gerar recibo mensal</button>
+    <button class="outline sm" onclick="exportCSV()">📥 Exportar CSV</button>
+  </div>`;
+}
+
+function generateRecibo(pid){
+  const now3=new Date();
+  const monthApps3=S.appointments.filter(a=>{
+    if(pid&&a.patientId!==pid)return false;
+    const d3=new Date(a.date);
+    return d3.getMonth()===now3.getMonth()&&d3.getFullYear()===now3.getFullYear()&&a.status!=='cancelled';
+  });
+  const pName3=pid?S.patients.find(x=>x.id===pid)?.name:'';
+  const totalSessoes=monthApps3.length;
+  const totalPago=monthApps3.filter(a=>a.payment==='paid').length*S.settings.sessionValue;
+  const totalPendente=monthApps3.filter(a=>a.payment==='pending').length*S.settings.sessionValue;
+  const totalGeral=totalSessoes*S.settings.sessionValue;
+  const printDiv=document.getElementById('reciboPrint');
+  printDiv.style.display='block';
+  printDiv.innerHTML=`
+<div style="max-width:600px;margin:0 auto;padding:30px;background:#fff;color:#000">
+<div style="text-align:center;margin-bottom:30px">
+  <h1 style="font-size:22px;margin-bottom:4px;color:#E85D1F">✦ ${esc(S.settings.name||'PsiGestao')}</h1>
+  <div style="font-size:13px;color:#666">${esc(S.settings.crp||'')}</div>
+  <div style="font-size:13px;color:#666">${esc(S.settings.endereco||'')}</div>
+  <div style="font-size:13px;color:#666">${esc(S.settings.telefone||'')}</div>
+</div>
+<h2 style="font-size:18px;text-align:center;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #E85D1F">${pid?'Recibo de Honorarios — '+esc(pName3):'Recibo Mensal de Honorarios'}</h2>
+<div style="margin-bottom:20px;font-size:14px;color:#333">
+  <p><strong>Mes:</strong> ${now3.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</p>
+  <p><strong>Profissional:</strong> ${esc(S.settings.name||'')}</p>
+  <p><strong>CRP:</strong> ${esc(S.settings.crp||'')}</p>
+</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+  <tr style="background:#f5f5f5"><th style="padding:8px;text-align:left;font-size:13px">Descricao</th><th style="padding:8px;text-align:right;font-size:13px">Qtde</th><th style="padding:8px;text-align:right;font-size:13px">Valor</th></tr>
+  <tr><td style="padding:8px;border-bottom:1px solid #ddd;font-size:13px">Sessoes clinicas</td><td style="padding:8px;border-bottom:1px solid #ddd;text-align:right;font-size:13px">${totalSessoes}</td><td style="padding:8px;border-bottom:1px solid #ddd;text-align:right;font-size:13px">R$ ${totalGeral.toFixed(2)}</td></tr>
+</table>
+<div style="text-align:right;font-size:16px;font-weight:700;margin-bottom:20px">Total: R$ ${totalGeral.toFixed(2)}</div>
+<div style="font-size:13px;color:#666;margin-bottom:10px">
+  <p>Recebido: R$ ${totalPago.toFixed(2)}</p>
+  <p>Pendente: R$ ${totalPendente.toFixed(2)}</p>
+</div>
+<div style="text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid #ddd;font-size:13px;color:#666">
+  <p>Chave PIX: ${esc(S.settings.pix||'')}</p>
+  <p style="margin-top:4px">✦ Documento emitido em ${fmtDateTime(now3)}</p>
+</div>
+</div>`;
+  printDiv.style.display='none';
+  const w=window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>Recibo</title><style>body{font-family:sans-serif;padding:20px}@media print{body{padding:0}}</style></head><body>'+printDiv.innerHTML+'</body></html>');
+  w.document.close();
+  w.print();
+}
+
+// ==============================
+// INSIGHTS
+// ==============================
+function renderInsights(c){
+  const {patterns,peakHours,sugestoes}=analyzePatterns();
+  const now=new Date();const month=now.getMonth();const year=now.getFullYear();
+  const monthApps=S.appointments.filter(a=>{const d=new Date(a.date);return d.getMonth()===month&&d.getFullYear()===year});
+  const totalMonth=monthApps.length;
+  const cancelados=monthApps.filter(a=>a.status==='cancelled').length;
+  const txFalta=totalMonth?Math.round(cancelados/totalMonth*100):0;
+  const pago=monthApps.filter(a=>a.payment==='paid').length*S.settings.sessionValue;
+  const esperado=monthApps.filter(a=>a.status!=='cancelled'&&a.payment!=='free').length*S.settings.sessionValue;
+  const txInadimplencia=esperado?Math.round((esperado-pago)/esperado*100):0;
+  const horaCount={};
+  monthApps.filter(a=>a.status!=='cancelled').forEach(a=>{horaCount[a.time]=(horaCount[a.time]||0)+1});
+  const topHoras=Object.entries(horaCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topSugestoes=sugestoes.slice(0,8);
+  const faltaRank=[];
+  S.patients.forEach(p=>{const apps=S.appointments.filter(a=>a.patientId===p.id);const faltas=apps.filter(a=>a.status==='cancelled').length;if(faltas>0)faltaRank.push({name:p.name,faltas,total:apps.length,pct:Math.round(faltas/apps.length*100)})});
+  faltaRank.sort((a,b)=>b.pct-a.pct);
+  const comRetorno=S.patients.filter(p=>{const apps=S.appointments.filter(a=>a.patientId===p.id);return apps.length>=2}).length;
+  const txRetencao=S.patients.length?Math.round(comRetorno/S.patients.length*100):0;
+  c.innerHTML=`<div class="stat-grid"><div class="stat-c"><div class="stat-l">Sessoes/mes</div><div class="stat-v">${totalMonth}</div></div><div class="stat-c"><div class="stat-l">Taxa de falta</div><div class="stat-v" style="color:${txFalta>20?'var(--red)':txFalta>10?'var(--amber)':'var(--green)'}">${txFalta}%</div></div><div class="stat-c"><div class="stat-l">Retencao</div><div class="stat-v" style="color:${txRetencao>70?'var(--green)':'var(--amber)'}">${txRetencao}%</div></div><div class="stat-c"><div class="stat-l">Inadimplencia</div><div class="stat-v" style="color:${txInadimplencia>20?'var(--red)':txInadimplencia>10?'var(--amber)':'var(--green)'}">${txInadimplencia}%</div></div></div>${patterns.length?'<div class="card"><div class="card-h"><h3>★ Pacientes com padrao</h3></div>'+patterns.map(p=>'<div class="pattern-card"><div class="p-day">'+p.dia.slice(0,3)+'</div><div class="p-info"><div class="p-name">'+esc(p.name)+'</div><div class="p-detail">'+p.hora+' - '+p.count+' de '+p.total+' sessoes - '+p.months+' meses</div></div><div class="p-pct">'+p.pct+'%</div></div>').join('')+'<div style="font-size:12px;color:var(--text2);margin-top:8px">★ Baseado em 3+ sessoes no mesmo horario</div></div>':''}${peakHours.length?'<div class="card"><div class="card-h"><h3>★ Horarios de pico</h3></div>'+peakHours.map(h=>'<div class="pattern-card"><div class="p-day">'+h.dia.slice(0,3)+'</div><div class="p-info"><div class="p-detail">'+h.hora+'</div></div><div class="p-pct">'+h.count+'x</div></div>').join('')+'</div>':''}${topHoras.length?'<div class="card"><div class="card-h"><h3>★ Top horarios</h3></div><div class="sug-grid">'+topHoras.map(([hora,count])=>'<div class="sug-card sug-high"><div class="sug-dia">'+hora+'</div><div class="sug-pct">'+count+'</div><div class="sug-label">sessoes</div></div>').join('')+'</div></div>':''}${topSugestoes.length?'<div class="card"><div class="card-h"><h3>★ Sugestao de horarios livres</h3></div><div class="sug-grid">'+topSugestoes.map(s=>'<div class="sug-card"><div class="sug-dia">'+s.dia.slice(0,3)+'</div><div class="sug-hora">'+fmtDate(s.date)+' '+s.time+'</div><div class="sug-label">Disponivel</div></div>').join('')+'</div></div>':''}${faltaRank.length?'<div class="card"><div class="card-h"><h3>★ Faltas por paciente</h3></div><table><tr><th>Paciente</th><th>Faltas</th><th>Total</th><th>%</th></tr>'+faltaRank.slice(0,5).map(p=>'<tr><td>'+esc(p.name)+'</td><td style="color:var(--red)">'+p.faltas+'</td><td>'+p.total+'</td><td><span class="badge badge-'+(p.pct>30?'red':p.pct>15?'amber':'green')+'">'+p.pct+'%</span></td></tr>').join('')+'</table></div>':''}<div style="font-size:11px;color:var(--text2);text-align:center;padding:12px">★ Dados atualizam automaticamente</div>`;
 }
 
 // ==============================
 // BOOKING LINKS
 // ==============================
 function renderBookLinks(c){
-  c.innerHTML=`
-<div class="card-h"><h3>Links de Agendamento</h3><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link</button></div>
-<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Compartilhe o link com seus pacientes. Eles veem os horários disponíveis e agendam direto pelo WhatsApp.</p>
-${S.bookingLinks.length?S.bookingLinks.map(bl=>{
-  const data=btoa(encodeURIComponent(JSON.stringify({name:bl.name,days:bl.days,start:bl.startHour,end:bl.endHour,dur:bl.duration,price:bl.price,gap:bl.gap,msg:bl.message,wa:S.settings.whatsapp,prof:S.settings.name})));const url=`https://tiagohanna123.github.io/psi-agenda/agendar/?d=${data}`;
-  return `<div class="bl-card">
-    <div class="bl-h"><h4>${esc(bl.name)||'Link de agendamento'}</h4>
-      <div style="display:flex;gap:4px">
-        <button class="btn-icon" onclick="copyText('${url}')" title="Copiar link">📋</button>
-        <button class="btn-icon" onclick="toggleBookingLink('${bl.id}')" title="${bl.active?'Desativar':'Ativar'}">${bl.active?'✅':'⏸️'}</button>
-        <button class="btn-icon" onclick="deleteBookingLink('${bl.id}')" title="Excluir" style="color:var(--red)">🗑️</button>
-      </div>
-    </div>
-    <div class="bl-url">
-      <code>${url}</code>
-      <button class="btn-icon" onclick="copyText('${url}')">📋</button>
-      <a href="${url}" target="_blank" class="btn-icon">↗️</a>
-    </div>
-    <div style="font-size:12px;color:var(--text2)">
-      <span class="bl-tag">${bl.days?.join(', ')||'Seg-Sex'}</span>
-      <span class="bl-tag">${bl.startHour||'08'}:00 - ${bl.endHour||'18'}:00</span>
-      <span class="bl-tag">${bl.duration||50}min</span>
-      <span class="bl-tag">R$ ${bl.price||S.settings.sessionValue}</span>
-      ${bl.active?'':'<span class="bl-tag" style="background:rgba(248,113,113,.15);color:var(--red)">Inativo</span>'}
-    </div>
-  </div>`;
-}).join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhum link de agendamento criado ainda.<br>Crie um link para seus pacientes agendarem online.</div>'}
-  <div style="margin-top:12px"><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link de Agendamento</button></div>`;
-  if(S.bookingLinks.length){
-    document.getElementById('mhActions').innerHTML=S.bookingLinks.filter(b=>b.active).length
-      ?`<span style="font-size:13px;color:var(--text2)">${S.bookingLinks.filter(b=>b.active).length} link${S.bookingLinks.filter(b=>b.active).length>1?'s':' ativo'} · ${S.appointments.filter(a=>a.bookingId).length} agendamentos via link</span>`
-      :'';
-  }
+  c.innerHTML=`<div class="card-h"><h3>★ Links de Agendamento</h3><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link</button></div><p style="font-size:13px;color:var(--text2);margin-bottom:16px">Compartilhe o link com seus pacientes. Eles escolhem o horario e agendam pelo WhatsApp.</p>${S.bookingLinks.length?S.bookingLinks.map(bl=>{const data=btoa(encodeURIComponent(JSON.stringify({name:bl.name,days:bl.days,start:bl.startHour,end:bl.endHour,dur:bl.duration,price:bl.price,gap:bl.gap,msg:bl.message,wa:S.settings.whatsapp,prof:S.settings.name,video:S.settings.videoLink})));const url=window.location.origin+'/psi-agenda/agendar/?d='+data;return '<div class="bl-card"><div class="bl-h"><h4>'+esc(bl.name)+'</h4><div style="display:flex;gap:4px"><button class="btn-icon" onclick="copyText(\''+url+'\')" title="Copiar">📋</button><button class="btn-icon" onclick="toggleBookingLink(\''+bl.id+'\')" title="'+(bl.active?'Desativar':'Ativar')+'">'+(bl.active?'✅':'⏸️')+'</button><button class="btn-icon" onclick="deleteBookingLink(\''+bl.id+'\')" title="Excluir" style="color:var(--red)">🗑️</button></div></div><div class="bl-url"><code>'+url+'</code><button class="btn-icon" onclick="copyText(\''+url+'\')">📋</button><a href="'+url+'" target="_blank" class="btn-icon">↗️</a></div><div style="font-size:12px;color:var(--text2)"><span class="bl-tag">'+(bl.days?.join(', ')||'Seg-Sex')+'</span><span class="bl-tag">'+(bl.startHour||'08')+':00 - '+(bl.endHour||'18')+':00</span><span class="bl-tag">'+(bl.duration||50)+'min</span><span class="bl-tag">★ R$ '+(bl.price||S.settings.sessionValue)+'</span>'+(bl.active?'':'<span class="bl-tag" style="background:rgba(239,68,68,.15);color:var(--red)">Inativo</span>')+'</div></div>'}).join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhum link de agendamento criado ainda.<br>Crie um link para pacientes agendarem online.</div>'}<div style="margin-top:12px"><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link de Agendamento</button></div>`;
 }
 
-function openNewBookingLink(){
-  const m=document.getElementById('modal');
-  m.innerHTML=`
-<div class="modal-h"><h3>Novo Link de Agendamento</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
-<div class="form-g"><label>Nome do link (ex: "Agendamento Online")</label><input id="blName" placeholder="Agendamento Online" value="Agendamento Online"></div>
-<div class="form-row">
-  <div class="form-g"><label>Dias da semana</label>
-    <div style="display:flex;gap:4px;flex-wrap:wrap">
-      ${['Seg','Ter','Qua','Qui','Sex','Sáb'].map((d,i)=>`<label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;padding:4px 8px;background:var(--bg3);border-radius:var(--r2)"><input type="checkbox" id="blD${i}" ${i<5?'checked':''}>${d}</label>`).join('')}
-    </div>
-  </div>
-  <div class="form-g"><label>Duração (min)</label><input type="number" id="blDur" value="${S.settings.duration}" min="30" max="120" step="10"></div>
-</div>
-<div class="form-row">
-  <div class="form-g"><label>Horário inicial</label><input type="time" id="blStart" value="08:00"></div>
-  <div class="form-g"><label>Horário final</label><input type="time" id="blEnd" value="18:00"></div>
-</div>
-<div class="form-row">
-  <div class="form-g"><label>Valor da sessão</label><input type="number" id="blPrice" value="${S.settings.sessionValue}" min="0"></div>
-  <div class="form-g"><label>Intervalo entre sessões (min)</label><input type="number" id="blGap" value="10" min="0" max="60"></div>
-</div>
-<div class="form-g"><label>Mensagem de boas-vindas</label><textarea id="blMsg" rows="2">Olá! Escolha o melhor horário para sua consulta.</textarea></div>
-<div class="form-actions">
-  <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
-  <button class="primary" onclick="saveBookingLink()">Criar Link</button>
-</div>`;
-  document.getElementById('modalO').classList.add('show');
-}
+function openNewBookingLink(){const m=document.getElementById('modal');m.innerHTML=`<div class="modal-h"><h3>Novo Link de Agendamento</h3><button class="btn-icon" onclick="closeModal()">✕</button></div><div class="form-g"><label>Nome do link</label><input id="blName" placeholder="Agendamento Online" value="Agendamento Online"></div><div class="form-row"><div class="form-g"><label>Dias disponiveis</label><div style="display:flex;gap:4px;flex-wrap:wrap">${['Seg','Ter','Qua','Qui','Sex','Sab'].map((d,i)=>'<label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;padding:4px 8px;background:var(--bg3);border-radius:var(--r2)"><input type="checkbox" id="blD'+i+'" '+(i<5?'checked':'')+'>'+d+'</label>').join('')}</div></div><div class="form-g"><label>Duracao (min)</label><input type="number" id="blDur" value="${S.settings.duration}" min="30" max="120" step="10"></div></div><div class="form-row"><div class="form-g"><label>Inicio</label><input type="time" id="blStart" value="08:00"></div><div class="form-g"><label>Fim</label><input type="time" id="blEnd" value="18:00"></div></div><div class="form-row"><div class="form-g"><label>Valor (R$)</label><input type="number" id="blPrice" value="${S.settings.sessionValue}" min="0"></div><div class="form-g"><label>Intervalo entre sessoes (min)</label><input type="number" id="blGap" value="10" min="0" max="60"></div></div><div class="form-g"><label>Mensagem de boas-vindas</label><textarea id="blMsg" rows="2">Ola! Escolha o melhor horario para sua consulta. ⚽</textarea></div><div class="form-actions"><button class="btn-ghost" onclick="closeModal()">Cancelar</button><button class="primary" onclick="saveBookingLink()">Criar Link</button></div>`;document.getElementById('modalO').classList.add('show');}
+function saveBookingLink(){const days=[];for(let i=0;i<6;i++){const cb=document.getElementById('blD'+i);if(cb&&cb.checked)days.push(['Seg','Ter','Qua','Qui','Sex','Sab'][i])}if(!days.length){toast('Selecione pelo menos um dia','err');return}S.bookingLinks.push({id:uid(),name:document.getElementById('blName').value.trim()||'Link',days,startHour:document.getElementById('blStart').value,endHour:document.getElementById('blEnd').value,duration:parseInt(document.getElementById('blDur').value)||50,price:parseFloat(document.getElementById('blPrice').value)||S.settings.sessionValue,gap:parseInt(document.getElementById('blGap').value)||10,message:document.getElementById('blMsg').value.trim(),active:true,createdAt:new Date().toISOString()});saveState();closeModal();toast('★ Link de agendamento criado!');renderTab();}
+function toggleBookingLink(id){const bl=S.bookingLinks.find(x=>x.id===id);if(bl){bl.active=!bl.active;saveState();renderTab();toast(bl.active?'Link ativado':'Link desativado')}}
+function deleteBookingLink(id){if(!confirm('Excluir este link permanentemente?'))return;S.bookingLinks=S.bookingLinks.filter(x=>x.id!==id);saveState();toast('Link excluido');renderTab();}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>toast('Copiado! ★')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copiado! ★')})}
 
-function saveBookingLink(){
-  const days=[];
-  for(let i=0;i<6;i++){const cb=document.getElementById('blD'+i);if(cb&&cb.checked)days.push(['Seg','Ter','Qua','Qui','Sex','Sáb'][i])}
-  if(!days.length){toast('Selecione pelo menos um dia','err');return}
-  S.bookingLinks.push({
-    id:uid(),
-    name:document.getElementById('blName').value.trim()||'Link de agendamento',
-    days,startHour:document.getElementById('blStart').value,endHour:document.getElementById('blEnd').value,
-    duration:parseInt(document.getElementById('blDur').value)||50,
-    price:parseFloat(document.getElementById('blPrice').value)||S.settings.sessionValue,
-    gap:parseInt(document.getElementById('blGap').value)||10,
-    message:document.getElementById('blMsg').value.trim(),
-    active:true,createdAt:new Date().toISOString()
-  });
-  saveState();closeModal();toast('Link de agendamento criado!');renderTab();
-}
+// ==============================
+// MURAL
+// ==============================
+function renderMural(c){c.innerHTML=`<div class="card-h"><h3>★ Mural de Recursos</h3><button class="primary sm" onclick="openMuralItemModal()">+ Adicionar</button></div><p style="font-size:13px;color:var(--text2);margin-bottom:16px">Links uteis para o dia a dia clinico.</p>${S.muralItems.map(item=>'<div class="mural-item" onclick="'+(item.url&&item.url!=='#'?'window.open(\''+item.url+'\',\'_blank\')':'')+'"><div class="m-icon">'+(item.icon||'📌')+'</div><div class="m-info"><div class="m-title">'+esc(item.title)+'</div><div class="m-desc">'+esc(item.desc)+'</div></div><button class="btn-icon" onclick="event.stopPropagation();deleteMuralItem(\''+item.id+'\')" title="Remover" style="color:var(--text2)">✕</button></div>').join('')}<div style="margin-top:12px"><button class="outline sm" onclick="restoreDefaultMural()">Restaurar padrao</button></div>`;}
+function openMuralItemModal(){const m=document.getElementById('modal');m.innerHTML=`<div class="modal-h"><h3>Adicionar ao Mural</h3><button class="btn-icon" onclick="closeModal()">✕</button></div><div class="form-g"><label>Titulo</label><input id="muTitle" placeholder="Nome do recurso"></div><div class="form-g"><label>Descricao</label><input id="muDesc" placeholder="Breve descricao"></div><div class="form-g"><label>URL</label><input id="muUrl" placeholder="https://..."></div><div class="form-g"><label>Icone (emoji)</label><input id="muIcon" placeholder="📋" value="📌" maxlength="2"></div><div class="form-actions"><button class="btn-ghost" onclick="closeModal()">Cancelar</button><button class="primary" onclick="saveMuralItem()">Adicionar</button></div>`;document.getElementById('modalO').classList.add('show');}
+function saveMuralItem(){const title=document.getElementById('muTitle').value.trim();if(!title){toast('Titulo e obrigatorio','err');return}S.muralItems.push({id:uid(),title,desc:document.getElementById('muDesc').value.trim(),url:document.getElementById('muUrl').value.trim(),icon:document.getElementById('muIcon').value.trim()||'📌'});saveState();closeModal();toast('Item adicionado ★');renderTab();}
+function deleteMuralItem(id){S.muralItems=S.muralItems.filter(x=>x.id!==id);saveState();renderTab()}
+function restoreDefaultMural(){if(!confirm('Restaurar o mural padrao? Itens personalizados serao removidos.'))return;S.muralItems=getDefaultMural();saveState();renderTab();toast('Mural restaurado ★');}
 
-function toggleBookingLink(id){
-  const bl=S.bookingLinks.find(x=>x.id===id);
-  if(bl){bl.active=!bl.active;saveState();renderTab();toast(bl.active?'Link ativado':'Link desativado')}
-}
-
-function deleteBookingLink(id){
-  if(!confirm('Excluir este link permanentemente?'))return;
-  S.bookingLinks=S.bookingLinks.filter(x=>x.id!==id);
-  saveState();toast('Link excluído');renderTab();
-}
-
-function copyText(t){
-  navigator.clipboard.writeText(t).then(()=>toast('Copiado!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copiado!')});
-}
+// ==============================
+// NOTES
+// ==============================
+function renderNotes(c){const sorted=[...S.notes].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));c.innerHTML=`<div class="card-h"><h3>★ Bloco de Notas</h3><button class="primary sm" onclick="openNoteModal()">+ Nova nota</button></div>${sorted.length?sorted.map(n=>'<div class="note-card" onclick="openNoteModal(\''+n.id+'\')"><div class="note-date">'+fmtDateTime(new Date(n.createdAt))+'</div><div class="note-text">'+esc(n.text.slice(0,200))+(n.text.length>200?'...':'')+'</div></div>').join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhuma nota ainda.</div>'}<div style="margin-top:12px"><button class="primary sm" onclick="openNoteModal()">+ Nova Nota</button></div>`;}
+function openNoteModal(id){const n=id?S.notes.find(x=>x.id===id):null;const m=document.getElementById('modal');m.innerHTML=`<div class="modal-h"><h3>${n?'Editar':'Nova'} Nota</h3><button class="btn-icon" onclick="closeModal()">✕</button></div><div class="form-g"><textarea id="noteText" rows="8" placeholder="Digite sua nota...">${esc(n?.text||'')}</textarea></div><div class="form-actions"><button class="btn-ghost" onclick="closeModal()">Cancelar</button>${n?'<button class="btn-ghost" onclick="deleteNote(\''+n.id+'\')" style="color:var(--red)">Excluir</button>':''}<button class="primary" onclick="${id?'saveNote(\''+id+'\')':'saveNote()'}">Salvar</button></div>`;document.getElementById('modalO').classList.add('show');}
+function saveNote(id){const text=document.getElementById('noteText').value.trim();if(!text){toast('Escreva algo na nota','err');return}if(id){const n=S.notes.find(x=>x.id===id);if(n)n.text=text;n.updatedAt=new Date().toISOString()}else{S.notes.push({id:uid(),text,createdAt:new Date().toISOString()})}saveState();closeModal();toast('Nota salva ★');renderTab();}
+function deleteNote(id){if(!confirm('Excluir esta nota?'))return;S.notes=S.notes.filter(x=>x.id!==id);saveState();closeModal();toast('Nota excluida');renderTab();}
 
 // ==============================
 // SETTINGS
 // ==============================
-function renderSettings(c){
-  c.innerHTML=`
-<div class="card">
-  <div class="set-g">
-    <h4>Dados do profissional</h4>
-    <div class="form-g"><label>Seu nome (para mensagens)</label><input id="sName" value="${esc(S.settings.name)}"></div>
-    <div class="form-g"><label>Seu WhatsApp (para receber agendamentos)</label><input id="sWA" value="${esc(S.settings.whatsapp)}" placeholder="61999999999"></div>
-  </div>
-  <div class="set-g">
-    <h4>Padrões de consulta</h4>
-    <div class="form-row">
-      <div class="form-g"><label>Valor da sessão (R$)</label><input type="number" id="sVal" value="${S.settings.sessionValue}" min="0"></div>
-      <div class="form-g"><label>Duração (min)</label><input type="number" id="sDur" value="${S.settings.duration}" min="30" max="120" step="10"></div>
-    </div>
-  </div>
-  <div class="set-g">
-    <h4>Modelos de mensagem WhatsApp</h4>
-    <div class="form-g"><label>Confirmação</label><textarea id="sMsgC" rows="2">${esc(S.settings.msgConfirm||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div>
-    <div class="form-g"><label>Lembrete</label><textarea id="sMsgR" rows="2">${esc(S.settings.msgRemind||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div>
-    <div class="form-g"><label>Cancelamento</label><textarea id="sMsgX" rows="2">${esc(S.settings.msgCancel||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div>
-  </div>
-  <button class="primary" onclick="saveSettings()">Salvar Configurações</button>
-</div>`;
-}
-
-function saveSettings(){
-  S.settings.name=document.getElementById('sName').value.trim()||'Dr(a)';
-  S.settings.whatsapp=document.getElementById('sWA').value.trim();
-  S.settings.sessionValue=parseFloat(document.getElementById('sVal').value)||150;
-  S.settings.duration=parseInt(document.getElementById('sDur').value)||50;
-  S.settings.msgConfirm=document.getElementById('sMsgC').value.trim();
-  S.settings.msgRemind=document.getElementById('sMsgR').value.trim();
-  S.settings.msgCancel=document.getElementById('sMsgX').value.trim();
-  saveState();toast('Configurações salvas');
-}
+function renderSettings(c){c.innerHTML=`<div class="card"><div class="set-g"><h4>⚽ Dados do consultorio</h4><div class="form-g"><label>Seu nome</label><input id="sName" value="${esc(S.settings.name)}"></div><div class="form-row"><div class="form-g"><label>CRP</label><input id="sCRP" value="${esc(S.settings.crp||'')}" placeholder="CRP 01/12345"></div><div class="form-g"><label>Telefone</label><input id="sTel" value="${esc(S.settings.telefone||'')}" placeholder="(61) 99999-9999"></div></div><div class="form-g"><label>Endereco do consultorio</label><input id="sEnd" value="${esc(S.settings.endereco||'')}" placeholder="Rua, numero, bairro"></div><div class="form-g"><label>Chave PIX</label><input id="sPix" value="${esc(S.settings.pix||'')}" placeholder="CPF, email ou telefone"></div></div><div class="set-g"><h4>📱 WhatsApp e Teleconsulta</h4><div class="form-g"><label>Seu WhatsApp (para links de agendamento)</label><input id="sWA" value="${esc(S.settings.whatsapp)}" placeholder="61999999999"></div><div class="form-g"><label>Link padrao de teleconsulta</label><input id="sVideo" value="${esc(S.settings.videoLink||'')}" placeholder="https://meet.google.com/"></div></div><div class="set-g"><h4>⚙️ Padroes de consulta</h4><div class="form-row"><div class="form-g"><label>Valor da sessao (R$)</label><input type="number" id="sVal" value="${S.settings.sessionValue}" min="0"></div><div class="form-g"><label>Duracao (min)</label><input type="number" id="sDur" value="${S.settings.duration}" min="30" max="120" step="10"></div></div></div><div class="set-g"><h4>💬 Modelos de mensagem WhatsApp</h4><div class="form-g"><label>Confirmacao</label><textarea id="sMsgC" rows="2">${esc(S.settings.msgConfirm||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div><div class="form-g"><label>Lembrete</label><textarea id="sMsgR" rows="2">${esc(S.settings.msgRemind||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div><div class="form-g"><label>Cancelamento</label><textarea id="sMsgX" rows="2">${esc(S.settings.msgCancel||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div></div><button class="primary" onclick="saveSettings()">★ Salvar Configuracoes</button></div>`;}
+function saveSettings(){S.settings.name=document.getElementById('sName').value.trim()||'Dr(a)';S.settings.whatsapp=document.getElementById('sWA').value.trim();S.settings.crp=document.getElementById('sCRP').value.trim();S.settings.telefone=document.getElementById('sTel').value.trim();S.settings.endereco=document.getElementById('sEnd').value.trim();S.settings.pix=document.getElementById('sPix').value.trim();S.settings.videoLink=document.getElementById('sVideo').value.trim();S.settings.sessionValue=parseFloat(document.getElementById('sVal').value)||150;S.settings.duration=parseInt(document.getElementById('sDur').value)||50;S.settings.msgConfirm=document.getElementById('sMsgC').value.trim();S.settings.msgRemind=document.getElementById('sMsgR').value.trim();S.settings.msgCancel=document.getElementById('sMsgX').value.trim();saveState();toast('★ Configuracoes salvas! ⚽');}
 
 // ==============================
-// SIDEBAR TOGGLE
+// SIDEBAR & MODAL
 // ==============================
-function toggleSidebar(){
-  const a=document.getElementById('aside');
-  const o=document.getElementById('sbOverlay');
-  a.classList.toggle('open');
-  o.classList.toggle('show');
-}
-function closeSidebar(){
-  const a=document.getElementById('aside');
-  const o=document.getElementById('sbOverlay');
-  a.classList.remove('open');
-  o.classList.remove('show');
-}
-
-// ==============================
-// MODAL
-// ==============================
-function closeModal(){document.getElementById('modalO').classList.remove('show')}
+function toggleSidebar(){document.getElementById('aside').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('aside').classList.remove('open');document.getElementById('sbOverlay').classList.remove('show')}
 
 // ==============================
 // LOGIN
 // ==============================
-function tryLogin(){
-  const pw=document.getElementById('pw').value;
-  if(pw==='ojoaojm123'){document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex'}
-  else{document.getElementById('loginE').style.display='block';document.getElementById('pw').value=''}
-}
-
+function tryLogin(){const pw=document.getElementById('pw').value;if(pw==='ojoaojm123'){sessionStorage.setItem('bf_logged','1');document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex'}else{document.getElementById('loginE').style.display='block';document.getElementById('pw').value=''}}
 function logout(){document.getElementById('app').style.display='none';document.getElementById('login').style.display='flex';document.getElementById('pw').value='';document.getElementById('loginE').style.display='none'}
 
 // ==============================
 // INIT
 // ==============================
-loadState();
-renderNav();
-// Auto-login if already logged (session)
-if(sessionStorage.getItem('psi_logged')){document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';renderTab()}
-// Patch login to set session
-const _try=tryLogin;tryLogin=function(){const pw=document.getElementById('pw').value;if(pw==='ojoaojm123'){sessionStorage.setItem('psi_logged','1');_try()}}
+loadState();renderNav();
+if(sessionStorage.getItem('bf_logged')){document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';renderTab()}
+const _try=tryLogin;tryLogin=function(){const pw=document.getElementById('pw').value;if(pw==='ojoaojm123'){sessionStorage.setItem('bf_logged','1');_try()}};
 </script>
 </body>
 </html>
