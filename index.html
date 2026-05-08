@@ -397,6 +397,13 @@ function monthLabel(offset){
 }
 
 function patientName(id){const p=S.patients.find(x=>x.id===id);return p?p.name:'Paciente removido'}
+const patientValue=id=>{const p=S.patients.find(x=>x.id===id);return p&&p.sessionValue?parseFloat(p.sessionValue):null}
+function getApptValue(a){
+  if(a.value!==undefined&&a.value!==null&&a.value!=='')return parseFloat(a.value);
+  const pv=patientValue(a.patientId);
+  if(pv!==null)return pv;
+  return S.settings.sessionValue;
+}
 function getApptsForDay(d){return S.appointments.filter(a=>{const ad=new Date(a.date);return sameDay(ad,d)&&a.status!=='cancelled'})}
 
 // ==============================
@@ -780,7 +787,7 @@ function quickBookSave(){
   if(!pid){toast('Selecione um paciente','err');return}
   const time=document.getElementById('qbT').value;
   const status=document.getElementById('qbS').value;
-  S.appointments.push({id:uid(),patientId:pid,date:window._qbDay.toISOString().split('T')[0],time,duration:S.settings.duration,status,payment:'pending',paymentMethod:'pix-pos',notes:'',createdAt:new Date().toISOString()});
+  S.appointments.push({id:uid(),patientId:pid,date:window._qbDay.toISOString().split('T')[0],time,duration:S.settings.duration,status,payment:'pending',paymentMethod:'pix-pos',notes:'',value:getApptValue({patientId:pid}),createdAt:new Date().toISOString()});
   saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
 
@@ -833,7 +840,7 @@ function renderPatientDetail(c){
   const confirmed=apps.filter(a=>a.status==='confirmed').length;
   const canceled=apps.filter(a=>a.status==='cancelled').length;
   const pendingPay=apps.filter(a=>a.payment==='pending');
-  const totalDevido=pendingPay.length*S.settings.sessionValue;
+  const totalDevido=pendingPay.reduce((s,a)=>s+getApptValue(a),0);
 
   // Pattern analysis for this patient
   const diasSem=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -867,8 +874,8 @@ function renderPatientDetail(c){
   <div class="stat-c"><div class="stat-l">Confirmadas</div><div class="stat-v" style="color:var(--green)">${confirmed}</div></div>
   <div class="stat-c"><div class="stat-l">Faltas</div><div class="stat-v" style="color:var(--red)">${canceled}</div></div>
   <div class="stat-c"><div class="stat-l">A pagar</div><div class="stat-v" style="color:var(--amber)">R$ ${totalDevido.toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">Valor sessao</div><div class="stat-v" style="color:var(--accent)">${p.sessionValue?'R$ '+parseFloat(p.sessionValue).toFixed(2):'Geral: R$ '+S.settings.sessionValue.toFixed(2)}</div></div>
 </div>
-
 ${bestFreq.length?`<div class="card"><div class="card-h"><h3>★ Padrão de horário</h3></div>
 ${bestFreq.map(([k,v])=>`<div class="pattern-card"><div class="p-day">${k.split(' ')[0].slice(0,3)}</div><div class="p-info"><div class="p-detail">${k.split(' ')[1]} — ${v}x em ${total} sessões</div></div><div class="p-pct">${Math.round(v/total*100)}%</div></div>`).join('')}
 </div>`:''}
@@ -912,7 +919,7 @@ function addEvolucao(pid){
 function saveEvolucao(pid){
   const notes=document.getElementById('evNotes').value.trim();
   if(!notes){toast('Escreva a anotação','err');return}
-  S.appointments.push({id:uid(),patientId:pid,date:today().toISOString().split('T')[0],time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),duration:S.settings.duration,status:'confirmed',payment:'pending',notes,createdAt:new Date().toISOString(),isNote:true});
+  S.appointments.push({id:uid(),patientId:pid,date:today().toISOString().split('T')[0],time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),duration:S.settings.duration,status:'confirmed',payment:'pending',notes,value:getApptValue({patientId:pid}),createdAt:new Date().toISOString(),isNote:true});
   saveState();closeModal();toast('Anotação salva ★');renderTab();
 }
 
@@ -935,7 +942,7 @@ function openNewApptForPatient(pid){
 }
 
 function newApptForPatientSave(pid){
-  S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',paymentMethod:'pix-pos',notes:'',createdAt:new Date().toISOString()});
+  S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',paymentMethod:'pix-pos',notes:'',value:getApptValue({patientId:pid}),createdAt:new Date().toISOString()});
   saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
 
@@ -950,6 +957,7 @@ function openPatientModal(id){
   <div class="form-g"><label>Email</label><input id="pEmail" type="email" value="${esc(p?.email||'')}"></div>
 </div>
 <div class="form-g"><label>Observações clínicas</label><textarea id="pNotes" rows="3">${esc(p?.notes||'')}</textarea></div>
+<div class="form-g"><label>Valor da sessão (R$)</label><input type="number" id="pVal" value="${p?.sessionValue||''}" min="0" placeholder="Usar valor geral: R$ ${S.settings.sessionValue}"></div>
 <div class="form-actions">
   <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
   <button class="primary" onclick="${id?`savePatient('${id}')`:'savePatient()'}">Salvar</button>
@@ -960,7 +968,8 @@ function openPatientModal(id){
 function savePatient(id){
   const n=document.getElementById('pName').value.trim();
   if(!n){toast('Nome é obrigatório','err');return}
-  const data={name:n,phone:document.getElementById('pPhone').value.trim(),email:document.getElementById('pEmail').value.trim(),notes:document.getElementById('pNotes').value.trim()};
+  const sv=document.getElementById('pVal').value.trim();
+  const data={name:n,phone:document.getElementById('pPhone').value.trim(),email:document.getElementById('pEmail').value.trim(),notes:document.getElementById('pNotes').value.trim(),sessionValue:sv?parseFloat(sv):null};
   if(id){Object.assign(S.patients.find(x=>x.id===id),data)}
   else{S.patients.push({id:uid(),...data,createdAt:new Date().toISOString()})}
   saveState();closeModal();toast(id?'Paciente atualizado':'Paciente cadastrado ★');renderTab();
@@ -990,7 +999,7 @@ function renderSessions(c){
 </div>
 <div class="search-b"><input type="search" placeholder="Buscar paciente..." value="${esc(sSearch)}" oninput="sSearch=this.value;renderTab()"></div>
 <div style="margin-bottom:12px;font-size:13px;color:var(--text2)">${apps.length} consulta${apps.length!==1?'s':''}</div>
-<table>${apps.length?`<tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Status</th><th>Pgto</th><th>Ações</th></tr>${apps.map(a=>{
+<table>${apps.length?`<tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Status</th><th>Pgto</th><th>Valor</th><th>Ações</th></tr>${apps.map(a=>{
   const p=patientName(a.patientId);
   const phone=S.patients.find(x=>x.id===a.patientId)?.phone;
   return `<tr onclick="openApptModal('${a.id}')" style="cursor:pointer">
@@ -998,12 +1007,13 @@ function renderSessions(c){
     <td>${esc(p)}</td>
     <td><span class="badge badge-${a.status==='confirmed'?'green':a.status==='cancelled'?'red':'amber'}">${a.status==='confirmed'?'Confirmada':a.status==='cancelled'?'Cancelada':'Pendente'}</span></td>
     <td><span class="badge badge-${a.payment==='paid'?'green':a.payment==='pending'?'amber':'red'}">${a.payment==='paid'?'Pago':a.payment==='pending'?'Pendente':'Isento'}</span></td>
+    <td style="color:var(--accent);font-weight:600">R$ ${getApptValue(a).toFixed(2)}</td>
     <td style="text-align:right;white-space:nowrap">
       <a href="${gcalLink('Consulta - '+p,a.date,a.time,a.notes,a.duration||S.settings.duration)}" target="_blank" class="btn-icon gcal" title="Google Calendar" onclick="event.stopPropagation()">📅</a>
       ${phone?`<a href="${waLink(phone,S.settings.msgConfirm.replace('{nome}',p).replace('{data}',fmtDate(new Date(a.date))).replace('{hora}',a.time))}" target="_blank" class="btn-icon whatsapp" title="WhatsApp" onclick="event.stopPropagation()">📱</a>`:''}
     </td>
   </tr>`;
-}).join('')}`:'<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text2)">★ Nenhuma consulta encontrada</td></tr>'}</table>`;
+}).join('')}`:'<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">★ Nenhuma consulta encontrada</td></tr>'}</table>`;
 }
 
 // ==============================
@@ -1032,6 +1042,7 @@ function openApptModal(id){
   </div>
 </div>
 <div class="form-g"><label>Duracao (min)</label><input type="number" id="aDur" value="${a.duration||S.settings.duration}" min="30" max="120" step="10"></div>
+<div class="form-g"><label>Valor (R$)</label><input type="number" id="aVal" value="${a.value!==undefined&&a.value!==null&&a.value!==''?a.value:getApptValue(a)}" min="0" step="5"></div>
 <div class="form-g"><label>Anotacoes clinicas</label>
 <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
   <div class="temp-item" onclick="insertATemplate('Estado geral: ')">Estado geral</div>
@@ -1075,6 +1086,8 @@ function saveAppt(id){
   a.paymentMethod=document.getElementById('aPayMethod').value;
   a.duration=parseInt(document.getElementById('aDur').value)||S.settings.duration;
   a.notes=document.getElementById('aNotes').value;
+  const nv=parseFloat(document.getElementById('aVal').value);
+  a.value=isNaN(nv)?null:nv;
   saveState();closeModal();toast('Consulta atualizada ★');renderTab();
 }
 
@@ -1123,16 +1136,17 @@ let fSearch='';
 function renderFinance(c){
   const now=new Date();const month=now.getMonth();const year=now.getFullYear();
   const monthApps=S.appointments.filter(a=>{const d=new Date(a.date);return d.getMonth()===month&&d.getFullYear()===year});
-  const paid=monthApps.filter(a=>a.payment==='paid').length*S.settings.sessionValue;
-  const pending=monthApps.filter(a=>a.payment==='pending').length*S.settings.sessionValue;
+  const paid=monthApps.filter(a=>a.payment==='paid').reduce((s,a)=>s+getApptValue(a),0);
+  const pending=monthApps.filter(a=>a.payment==='pending').reduce((s,a)=>s+getApptValue(a),0);
   const total=monthApps.length;
   const canceled=monthApps.filter(a=>a.status==='cancelled').length;
-  const receitaTotal=monthApps.filter(a=>a.status!=='cancelled'&&a.payment!=='free').length*S.settings.sessionValue;
+  const receitaTotal=monthApps.filter(a=>a.status!=='cancelled'&&a.payment!=='free').reduce((s,a)=>s+getApptValue(a),0);
   const inadimplencia=receitaTotal>0?Math.round((receitaTotal-paid)/receitaTotal*100):0;
-  const pixPreCount=monthApps.filter(a=>a.payment==='paid'&&a.paymentMethod==='pix-pre').length;
-  const pixPosCount=monthApps.filter(a=>a.payment==='paid'&&a.paymentMethod==='pix-pos').length;
-  const pixPreVal=pixPreCount*S.settings.sessionValue;
-  const pixPosVal=pixPosCount*S.settings.sessionValue;
+  const paidApps=monthApps.filter(a=>a.payment==='paid');
+  const pixPreVal=paidApps.filter(a=>a.paymentMethod==='pix-pre').reduce((s,a)=>s+getApptValue(a),0);
+  const pixPosVal=paidApps.filter(a=>a.paymentMethod==='pix-pos').reduce((s,a)=>s+getApptValue(a),0);
+  const pixPreCount=paidApps.filter(a=>a.paymentMethod==='pix-pre').length;
+  const pixPosCount=paidApps.filter(a=>a.paymentMethod==='pix-pos').length;
   const outrosVal=paid-pixPreVal-pixPosVal;
   let histApps=monthApps.sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(fSearch)histApps=histApps.filter(a=>{const n=patientName(a.patientId);return n.toLowerCase().includes(fSearch.toLowerCase())});
@@ -1160,7 +1174,7 @@ function renderFinance(c){
       const p=patientName(a.patientId);
       return `<tr onclick="openApptModal('${a.id}')" style="cursor:pointer">
         <td>${fmtDate(new Date(a.date))}</td><td>${esc(p)}</td>
-        <td>R$ ${a.payment==='free'?'0,00':S.settings.sessionValue.toFixed(2)}</td>
+        <td>R$ ${a.payment==='free'?'0,00':getApptValue(a).toFixed(2)}</td>
         <td><span class="badge badge-${a.status==='confirmed'?'green':a.status==='cancelled'?'red':'amber'}">${a.status==='confirmed'?'Confirmada':a.status==='cancelled'?'Cancelada':'Pendente'}</span></td>
         <td><span class="badge badge-${a.payment==='paid'?'green':a.payment==='pending'?'amber':'red'}">${a.payment==='paid'?'Pago':a.payment==='pending'?'Pendente':'Isento'}</span></td>
       </tr>`;
@@ -1177,7 +1191,7 @@ function exportCSV(){
   let csv='Data,Hora,Paciente,Status,Pagamento,Valor,Anotacoes\\n';
   S.appointments.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(a=>{
     const p=patientName(a.patientId);
-    const v=a.payment==='paid'?S.settings.sessionValue:a.payment==='free'?0:0;
+    const v=a.payment==='paid'?getApptValue(a):a.payment==='free'?0:0;
     csv+=`${a.date},${a.time},"${p}",${a.status},${a.payment},${v},"${(a.notes||'').replace(/"/g,'""')}"\\n`;
   });
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
@@ -1205,15 +1219,15 @@ function renderHonorarios(c){
 <div class="card-h"><h3>★ Honorarios — ${now2.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</h3>
   <button class="outline sm" onclick="generateRecibo()">📄 Recibo</button></div>
 <div class="stat-grid">
-  <div class="stat-c"><div class="stat-l">Receita total</div><div class="stat-v" style="color:var(--green)">R$ ${(monthApps2.filter(a=>a.payment==='paid').length*S.settings.sessionValue).toFixed(2)}</div></div>
-  <div class="stat-c"><div class="stat-l">Valor por sessao</div><div class="stat-v" style="color:var(--accent)">R$ ${S.settings.sessionValue.toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">Receita total</div><div class="stat-v" style="color:var(--green)">R$ ${monthApps2.filter(a=>a.payment==='paid').reduce((s,a)=>s+getApptValue(a),0).toFixed(2)}</div></div>
+  <div class="stat-c"><div class="stat-l">Valor geral</div><div class="stat-v" style="color:var(--accent)">R$ ${S.settings.sessionValue.toFixed(2)}</div></div>
 </div>
 <div class="search-b"><input type="search" placeholder="Buscar paciente..." value="${esc(hSearch)}" oninput="hSearch=this.value;renderTab()"></div>
 ${entries.map(([pid,data])=>{
   const p2=S.patients.find(x=>x.id===pid);
-  const totalValor=data.count*S.settings.sessionValue;
-  const recebido=data.paid*S.settings.sessionValue;
-  const pendente2=data.pending*S.settings.sessionValue;
+  const totalValor=data.count*getApptValue({patientId:pid});
+  const recebido=data.paid*getApptValue({patientId:pid});
+  const pendente2=data.pending*getApptValue({patientId:pid});
   return `<div class="recibo-box"><div class="rec-linha"><span>${esc(p2?.name||'?')}</span><span>${data.count} sessoes</span></div>
     <div class="rec-linha"><span style="color:var(--text2)">Recebido</span><span style="color:var(--green)">R$ ${recebido.toFixed(2)}</span></div>
     <div class="rec-linha"><span style="color:var(--text2)">Pendente</span><span style="color:var(--amber)">R$ ${pendente2.toFixed(2)}</span></div>
@@ -1234,9 +1248,9 @@ function generateRecibo(pid){
   });
   const pName3=pid?S.patients.find(x=>x.id===pid)?.name:'';
   const totalSessoes=monthApps3.length;
-  const totalPago=monthApps3.filter(a=>a.payment==='paid').length*S.settings.sessionValue;
-  const totalPendente=monthApps3.filter(a=>a.payment==='pending').length*S.settings.sessionValue;
-  const totalGeral=totalSessoes*S.settings.sessionValue;
+  const totalPago=monthApps3.filter(a=>a.payment==='paid').reduce((s,a)=>s+getApptValue(a),0);
+  const totalPendente=monthApps3.filter(a=>a.payment==='pending').reduce((s,a)=>s+getApptValue(a),0);
+  const totalGeral=monthApps3.reduce((s,a)=>s+getApptValue(a),0);
   const printDiv=document.getElementById('reciboPrint');
   printDiv.style.display='block';
   printDiv.innerHTML=`
@@ -1284,8 +1298,8 @@ function renderInsights(c){
   const totalMonth=monthApps.length;
   const cancelados=monthApps.filter(a=>a.status==='cancelled').length;
   const txFalta=totalMonth?Math.round(cancelados/totalMonth*100):0;
-  const pago=monthApps.filter(a=>a.payment==='paid').length*S.settings.sessionValue;
-  const esperado=monthApps.filter(a=>a.status!=='cancelled'&&a.payment!=='free').length*S.settings.sessionValue;
+  const pago=monthApps.filter(a=>a.payment==='paid').reduce((s,a)=>s+getApptValue(a),0);
+  const esperado=monthApps.filter(a=>a.status!=='cancelled'&&a.payment!=='free').reduce((s,a)=>s+getApptValue(a),0);
   const txInadimplencia=esperado?Math.round((esperado-pago)/esperado*100):0;
   const horaCount={};
   monthApps.filter(a=>a.status!=='cancelled').forEach(a=>{horaCount[a.time]=(horaCount[a.time]||0)+1});
