@@ -154,6 +154,18 @@ tr:hover td{background:var(--bg3)}
 .search-b{display:flex;gap:8px;margin-bottom:12px}
 .search-b input{flex:1}
 
+/* Searchable patient select */
+.sp-wrap{position:relative}
+.sp-input{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--bg4);color:var(--text);border-radius:var(--r2);font-size:14px;outline:none;transition:border .2s}
+.sp-input:focus{border-color:var(--accent)}
+.sp-list{position:absolute;top:100%;left:0;right:0;max-height:220px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bg4);border-radius:0 0 var(--r2) var(--r2);z-index:100;display:none;box-shadow:var(--shadow)}
+.sp-list.show{display:block}
+.sp-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--bg3);transition:.1s}
+.sp-item:hover,.sp-item.hl{background:var(--bg4);color:var(--accent)}
+.sp-item:last-child{border:none}
+.sp-item .sp-phone{font-size:11px;color:var(--text2);margin-left:8px}
+.sp-empty{padding:14px;text-align:center;color:var(--text2);font-size:13px}
+
 /* Sub tabs */
 .sub-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--bg3);padding-bottom:4px}
 .sub-tab{padding:8px 16px;font-size:13px;color:var(--text2);border-radius:var(--r2) var(--r2) 0 0;transition:.15s;cursor:pointer}
@@ -386,6 +398,71 @@ function monthLabel(offset){
 
 function patientName(id){const p=S.patients.find(x=>x.id===id);return p?p.name:'Paciente removido'}
 function getApptsForDay(d){return S.appointments.filter(a=>{const ad=new Date(a.date);return sameDay(ad,d)&&a.status!=='cancelled'})}
+
+// ==============================
+// SEARCHABLE PATIENT SELECT
+// ==============================
+// _spVal[id] stores selected patientId for each searchable select instance
+const _spVal={};
+let _spFocus=null;
+
+function buildSP(containerId, selectedId=''){
+  const c=document.getElementById(containerId);
+  const cid=containerId+'_val';
+  _spVal[cid]=selectedId;
+  const defLabel=selectedId?esc(S.patients.find(x=>x.id===selectedId)?.name||''):'';
+  c.innerHTML=`<div class="sp-wrap">
+    <input class="sp-input" id="${containerId}_inp" placeholder="Digite para buscar paciente..." value="${defLabel}"
+      autocomplete="off" oninput="filterSP(this,'${containerId}_list','${cid}')" onfocus="filterSP(this,'${containerId}_list','${cid}')" onkeydown="spKeyDown(event,'${containerId}_list','${containerId}_inp','${cid}')">
+    <div class="sp-list" id="${containerId}_list"></div>
+  </div>`;
+  filterSP(document.getElementById(containerId+'_inp'),containerId+'_list',cid);
+}
+
+function filterSP(inp,listId,cid){
+  const q=inp.value.trim().toLowerCase();
+  const list=document.getElementById(listId);
+  const filtered=S.patients.filter(p=>!q||p.name.toLowerCase().includes(q));
+  list.innerHTML=filtered.length?filtered.map((p,i)=>`<div class="sp-item${i===0?' hl':''}" data-id="${p.id}" onclick="pickSP('${p.id}','${listId}','${cid}')" onmouseenter="spHover(this,'${listId}')">${esc(p.name)}${p.phone?' <span class="sp-phone">📱'+esc(p.phone)+'</span>':''}</div>`).join(''):'<div class="sp-empty">Nenhum paciente encontrado</div>';
+  list.classList.add('show');
+  _spFocus=listId;
+}
+
+function spKeyDown(e,listId,inpId,cid){
+  const list=document.getElementById(listId);
+  const items=list.querySelectorAll('.sp-item');
+  if(!items.length||!list.classList.contains('show'))return;
+  let idx=Array.from(items).findIndex(x=>x.classList.contains('hl'));
+  if(e.key==='ArrowDown'){e.preventDefault();idx=Math.min(idx+1,items.length-1)}
+  else if(e.key==='ArrowUp'){e.preventDefault();idx=Math.max(idx-1,0)}
+  else if(e.key==='Enter'){e.preventDefault();if(idx>=0){items[idx].click()};return}
+  else if(e.key==='Escape'){e.preventDefault();list.classList.remove('show');return}
+  else return;
+  items.forEach(x=>x.classList.remove('hl'));
+  items[idx].classList.add('hl');
+  items[idx].scrollIntoView({block:'nearest'});
+}
+
+function spHover(el,listId){
+  document.querySelectorAll(`#${listId} .sp-item`).forEach(x=>x.classList.remove('hl'));
+  el.classList.add('hl');
+}
+
+function pickSP(pid,listId,cid){
+  const p=S.patients.find(x=>x.id===pid);
+  _spVal[cid]=pid;
+  const wrap=document.getElementById(listId).closest('.sp-wrap');
+  const inp=wrap.querySelector('.sp-input');
+  inp.value=esc(p?p.name:'');
+  document.getElementById(listId).classList.remove('show');
+}
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.sp-wrap')){
+    document.querySelectorAll('.sp-list.show').forEach(x=>x.classList.remove('show'));
+  }
+});
 
 // ==============================
 // WHATSAPP & GCAL
@@ -681,7 +758,7 @@ function openQuickBook(day){
 ${patSuggest}
 <div class="form-g">
   <label>Paciente</label>
-  <select id="qbP">${pOpts||'<option value="">Nenhum paciente cadastrado</option>'}</select>
+  <div id="qbP"></div>
 </div>
 <div class="form-row">
   <div class="form-g"><label>Horário</label><input type="time" id="qbT" value="08:00"></div>
@@ -695,10 +772,11 @@ ${patSuggest}
 </div>`;
   document.getElementById('modalO').classList.add('show');
   window._qbDay=day;
+  setTimeout(()=>buildSP('qbP'),10);
 }
 
 function quickBookSave(){
-  const pid=document.getElementById('qbP').value;
+  const pid=_spVal['qbP_val'];
   if(!pid){toast('Selecione um paciente','err');return}
   const time=document.getElementById('qbT').value;
   const status=document.getElementById('qbS').value;
@@ -899,15 +977,18 @@ function deletePatient(id){
 // SESSIONS
 // ==============================
 let sFilter='all';
+let sSearch='';
 function renderSessions(c){
   let apps=[...S.appointments].sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(sFilter==='today'){const t=today();apps=apps.filter(a=>sameDay(new Date(a.date),t))}
   else if(sFilter==='week'){const s=weekStart(0),e=addDays(s,4);apps=apps.filter(a=>{const d=new Date(a.date);return d>=s&&d<=e})}
   else if(sFilter==='pending')apps=apps.filter(a=>a.status==='pending')
+  if(sSearch)apps=apps.filter(a=>{const n=patientName(a.patientId);return n.toLowerCase().includes(sSearch.toLowerCase())})
   c.innerHTML=`
 <div class="pill-group">
   ${[{id:'all',l:'Todas'},{id:'today',l:'Hoje'},{id:'week',l:'Esta Semana'},{id:'pending',l:'Pendentes'}].map(x=>`<div class="pill${sFilter===x.id?' act':''}" onclick="sFilter='${x.id}';renderTab()">${x.l}</div>`).join('')}
 </div>
+<div class="search-b"><input type="search" placeholder="Buscar paciente..." value="${esc(sSearch)}" oninput="sSearch=this.value;renderTab()"></div>
 <div style="margin-bottom:12px;font-size:13px;color:var(--text2)">${apps.length} consulta${apps.length!==1?'s':''}</div>
 <table>${apps.length?`<tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Status</th><th>Pgto</th><th>Ações</th></tr>${apps.map(a=>{
   const p=patientName(a.patientId);
@@ -1015,7 +1096,7 @@ function openNewApptModal(){
   const m=document.getElementById('modal');
   m.innerHTML=`
 <div class="modal-h"><h3>Nova Consulta</h3><button class="btn-icon" onclick="closeModal()">✕</button></div>
-<div class="form-g"><label>Paciente</label><select id="naP">${S.patients.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div>
+<div class="form-g"><label>Paciente</label><div id="naP"></div></div>
 <div class="form-row">
   <div class="form-g"><label>Data</label><input type="date" id="naD" value="${today().toISOString().split('T')[0]}"></div>
   <div class="form-g"><label>Horario</label><input type="time" id="naT" value="08:00"></div>
@@ -1024,12 +1105,13 @@ function openNewApptModal(){
 <div class="form-actions">
   <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
   <button class="primary" onclick="newApptSave()">Agendar</button>
-</div>`;
+  </div>`;
   document.getElementById('modalO').classList.add('show');
+  setTimeout(()=>buildSP('naP'),10);
 }
 
 function newApptSave(){
-  const pid=document.getElementById('naP').value;
+  const pid=_spVal['naP_val'];
   S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',paymentMethod:'pix-pos',notes:'',createdAt:new Date().toISOString()});
   saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
@@ -1037,6 +1119,7 @@ function newApptSave(){
 // ==============================
 // FINANCE
 // ==============================
+let fSearch='';
 function renderFinance(c){
   const now=new Date();const month=now.getMonth();const year=now.getFullYear();
   const monthApps=S.appointments.filter(a=>{const d=new Date(a.date);return d.getMonth()===month&&d.getFullYear()===year});
@@ -1051,6 +1134,8 @@ function renderFinance(c){
   const pixPreVal=pixPreCount*S.settings.sessionValue;
   const pixPosVal=pixPosCount*S.settings.sessionValue;
   const outrosVal=paid-pixPreVal-pixPosVal;
+  let histApps=monthApps.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(fSearch)histApps=histApps.filter(a=>{const n=patientName(a.patientId);return n.toLowerCase().includes(fSearch.toLowerCase())});
   c.innerHTML=`
 <div class="stat-grid">
   <div class="stat-c"><div class="stat-l">Faturamento</div><div class="stat-v" style="color:var(--green)">R$ ${paid.toFixed(2)}</div></div>
@@ -1068,9 +1153,10 @@ function renderFinance(c){
 </div>
 <div class="card">
   <div class="card-h"><h3>★ Historico</h3><button class="outline sm" onclick="exportCSV()">📥 CSV</button></div>
+  <div class="search-b"><input type="search" placeholder="Buscar paciente..." value="${esc(fSearch)}" oninput="fSearch=this.value;renderTab()"></div>
   <table>
     <tr><th>Data</th><th>Paciente</th><th>Valor</th><th>Status</th><th>Pgto</th></tr>
-    ${monthApps.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(a=>{
+    ${histApps.map(a=>{
       const p=patientName(a.patientId);
       return `<tr onclick="openApptModal('${a.id}')" style="cursor:pointer">
         <td>${fmtDate(new Date(a.date))}</td><td>${esc(p)}</td>
@@ -1102,6 +1188,7 @@ function exportCSV(){
 // ==============================
 // HONORARIOS
 // ==============================
+let hSearch='';
 function renderHonorarios(c){
   const now2=new Date();const month2=now2.getMonth();const year2=now2.getFullYear();
   const monthApps2=S.appointments.filter(a=>{const d=new Date(a.date);return d.getMonth()===month2&&d.getFullYear()===year2&&a.status!=='cancelled'});
@@ -1112,6 +1199,8 @@ function renderHonorarios(c){
     if(a.payment==='paid')porPaciente[a.patientId].paid++;
     else if(a.payment==='pending')porPaciente[a.patientId].pending++;
   });
+  let entries=Object.entries(porPaciente);
+  if(hSearch)entries=entries.filter(([pid])=>{const p2=S.patients.find(x=>x.id===pid);return p2&&p2.name.toLowerCase().includes(hSearch.toLowerCase())});
   c.innerHTML=`
 <div class="card-h"><h3>★ Honorarios — ${now2.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</h3>
   <button class="outline sm" onclick="generateRecibo()">📄 Recibo</button></div>
@@ -1119,7 +1208,8 @@ function renderHonorarios(c){
   <div class="stat-c"><div class="stat-l">Receita total</div><div class="stat-v" style="color:var(--green)">R$ ${(monthApps2.filter(a=>a.payment==='paid').length*S.settings.sessionValue).toFixed(2)}</div></div>
   <div class="stat-c"><div class="stat-l">Valor por sessao</div><div class="stat-v" style="color:var(--accent)">R$ ${S.settings.sessionValue.toFixed(2)}</div></div>
 </div>
-${Object.entries(porPaciente).map(([pid,data])=>{
+<div class="search-b"><input type="search" placeholder="Buscar paciente..." value="${esc(hSearch)}" oninput="hSearch=this.value;renderTab()"></div>
+${entries.map(([pid,data])=>{
   const p2=S.patients.find(x=>x.id===pid);
   const totalValor=data.count*S.settings.sessionValue;
   const recebido=data.paid*S.settings.sessionValue;
