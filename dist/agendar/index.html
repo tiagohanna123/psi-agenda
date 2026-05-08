@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#000000">
+<title>★ Agendar Consulta — PsiGestão</title>
+<style>
+:root{--bg:#000;--bg2:#111;--bg3:#1a1a1a;--bg4:#2a2a2a;--text:#f0f0f0;--text2:#999;--accent:#E85D1F;--accent2:#d04d10;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--radius:12px;--r2:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;display:flex;justify-content:center;padding:20px;min-height:100vh}
+.w{max-width:520px;width:100%}
+h1{font-size:22px;margin-bottom:4px;text-align:center}
+h1 .star{color:var(--accent)}
+h1 span{color:var(--accent)}
+.sub{color:var(--text2);font-size:13px;text-align:center;margin-bottom:20px}
+.card{background:var(--bg2);border-radius:var(--radius);padding:20px;margin-bottom:12px;border:1px solid var(--bg3)}
+.card h3{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--text)}
+.info-line{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--bg3)}
+.info-line:last-child{border:none}
+.info-label{color:var(--text2)}
+.info-value{font-weight:500}
+input,select{font-family:var(--font);width:100%;padding:12px 14px;background:var(--bg3);border:1px solid var(--bg4);color:var(--text);border-radius:var(--r2);font-size:15px;outline:none;transition:border .2s;margin-bottom:10px}
+input:focus{border-color:var(--accent)}
+label{display:block;font-size:13px;color:var(--text2);margin-bottom:4px;font-weight:500}
+button{font-family:var(--font);cursor:pointer;border:none;border-radius:var(--r2);padding:12px 24px;font-size:15px;font-weight:600;transition:background .2s}
+button.primary{background:var(--accent);color:#fff;width:100%}
+button.primary:hover{background:var(--accent2)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.day-g{margin-bottom:16px}
+.day-h{font-size:14px;font-weight:600;margin-bottom:8px;padding:8px 0;border-bottom:1px solid var(--bg3)}
+.slot-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px}
+.slot{background:var(--bg3);border:1px solid var(--bg4);border-radius:var(--r2);padding:8px;text-align:center;font-size:13px;cursor:pointer;transition:.15s}
+.slot:hover{border-color:var(--accent);background:var(--bg4)}
+.slot.sel{border-color:var(--accent);background:rgba(124,111,247,.2);color:var(--accent);font-weight:600}
+.slot.past{opacity:.3;cursor:not-allowed}
+.steps{display:flex;gap:8px;margin-bottom:20px;justify-content:center}
+.step{width:30px;height:30px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.step.act{background:var(--accent);color:#fff}
+.step.done{background:var(--green);color:#fff}
+.step-l{font-size:12px;color:var(--text2);margin-top:4px;text-align:center}
+.conf-box{text-align:center;padding:20px}
+.conf-box .icon{font-size:48px;margin-bottom:12px}
+.conf-box h2{font-size:20px;margin-bottom:8px}
+.conf-box p{color:var(--text2);margin-bottom:16px}
+.conf-detail{background:var(--bg3);border-radius:var(--r2);padding:12px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.6}
+.whatsapp-btn{background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;font-size:16px;border-radius:var(--r2)}
+.whatsapp-btn:hover{background:#1da950}
+.form-g{margin-bottom:10px}
+.error{color:var(--red);font-size:13px;margin-top:4px;display:none}
+.loading{text-align:center;padding:40px;color:var(--text2)}
+.loading .sp{display:inline-block;width:32px;height:32px;border:3px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.select-wa{display:flex;gap:8px;align-items:center;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:var(--r2);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--green)}
+.price-tag{font-size:28px;font-weight:700;text-align:center;color:var(--accent);margin:10px 0}
+@media(max-width:480px){.slot-g{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="w" id="app">
+  <h1><span class="star">★</span> <span>Psi</span>Gestão</h1>
+  <p class="sub" id="subtitle">Agende sua consulta online</p>
+  <div id="content"><div class="loading"><div class="sp"></div><p>Carregando...</p></div></div>
+</div>
+
+<script>
+// Decode booking data from URL
+const params=new URLSearchParams(location.search);
+const rawD=params.get('d');
+let config=null;
+
+if(rawD){
+  try{
+    const decoded=decodeURIComponent(atob(rawD));
+    config=JSON.parse(decoded);
+  }catch(e){console.error('Invalid booking data',e)}
+}
+
+// State
+let step=1; // 1: pick day/slot, 2: fill info, 3: confirm
+let selectedSlot=null; // {date, timeLabel, time}
+let patientName='';
+let patientPhone='';
+
+const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MONTHS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function fmt(d){return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`}
+
+function isPast(d,t){
+  const now=new Date();
+  const slot=new Date(d.getFullYear(),d.getMonth(),d.getDate(),parseInt(t.split(':')[0]),parseInt(t.split(':')[1]));
+  return slot<now;
+}
+
+function getSlots(){
+  if(!config)return [];
+  const slots=[];
+  const today=new Date();
+  for(let day=0;day<14;day++){
+    const date=new Date(today);date.setDate(date.getDate()+day);
+    const dayName=DAYS[date.getDay()];
+    if(!config.days.includes(dayName))continue;
+    const daySlots=[];
+    const startH=parseInt(config.start.split(':')[0]);
+    const endH=parseInt(config.end.split(':')[0]);
+    const dur=config.dur||50;
+    for(let h=startH;h<endH;h++){
+      for(let m=0;m<60;m+=dur+(config.gap||0)){
+        if(h===endH&&m>0)break;
+        const timeStr=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        const slotEnd=new Date(date.getFullYear(),date.getMonth(),date.getDate(),h,m+dur);
+        const slotStart=new Date(date.getFullYear(),date.getMonth(),date.getDate(),h,m);
+        if(slotStart<new Date()&&day===0)continue; // skip past slots only today
+        daySlots.push({
+          date:date.toISOString(),
+          dateLabel:fmt(date),
+          dayLabel:dayName+', '+fmt(date),
+          time:timeStr,
+          timeLabel:timeStr,
+          fullLabel:dayName+', '+fmt(date)+' às '+timeStr
+        });
+      }
+    }
+    if(daySlots.length)slots.push({date,dayLabel:dayName+', '+date.getDate()+' de '+MONTHS[date.getMonth()],iso:date.toISOString(),slots:daySlots});
+  }
+  return slots;
+}
+
+function renderStep1(){
+  const slots=getSlots();
+  const c=document.getElementById('content');
+  if(!config){c.innerHTML='<div class="card"><div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:12px">🔗</div><h3>Link inválido</h3><p style="color:var(--text2);margin-top:8px">Este link de agendamento não é válido. Verifique o link ou entre em contato com o profissional.</p></div></div>';return}
+  if(!slots.length){c.innerHTML='<div class="card"><div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:12px">📅</div><h3>Nenhum horário disponível</h3><p style="color:var(--text2);margin-top:8px">Não há horários disponíveis nos próximos 14 dias. Tente novamente mais tarde.</p></div></div>';return}
+
+  c.innerHTML=`
+<div class="steps"><div class="step act">1</div><div class="step">2</div><div class="step">3</div></div>
+<div class="card">
+  <div class="price-tag">R$ ${config.price||'—'}</div>
+  <p style="text-align:center;color:var(--text2);font-size:13px">${config.dur} minutos de consulta</p>
+</div>
+${slots.map(g=>`
+<div class="day-g">
+  <div class="day-h">${g.dayLabel}</div>
+  <div class="slot-g">
+    ${g.slots.map(s=>`<div class="slot" data-date="${s.date}" data-time="${s.time}" onclick="pickSlot('${s.date}','${s.time}')">${s.time}</div>`).join('')}
+  </div>
+</div>`).join('')}
+<div style="margin-top:12px">
+  ${config.msg?`<div class="card" style="font-size:13px;color:var(--text2);padding:12px">💬 ${esc(config.msg)}</div>`:''}
+</div>`;
+}
+
+function pickSlot(date,time){
+  selectedSlot={date,time};
+  document.querySelectorAll('.slot').forEach(el=>el.classList.remove('sel'));
+  document.querySelectorAll(`.slot[data-date="${date}"][data-time="${time}"]`).forEach(el=>el.classList.add('sel'));
+  step=2;
+  renderStep2();
+}
+
+function renderStep2(){
+  if(!selectedSlot){step=1;renderStep1();return}
+  const c=document.getElementById('content');
+  const slotDate=new Date(selectedSlot.date);
+  c.innerHTML=`
+<div class="steps"><div class="step done">✓</div><div class="step act">2</div><div class="step">3</div></div>
+<div class="card" style="text-align:center">
+  <div style="font-size:36px;margin-bottom:8px">📅</div>
+  <div style="font-size:16px;font-weight:600">${slotDate.toLocaleDateString('pt-BR',{weekday:'long'})}, ${fmt(slotDate)}</div>
+  <div style="font-size:22px;font-weight:700;color:var(--accent);margin-top:4px">${selectedSlot.time}</div>
+</div>
+<div class="card">
+  <h3>Seus dados</h3>
+  <div class="form-g"><label>Seu nome</label><input id="pName" placeholder="Nome completo" value="${esc(patientName)}" oninput="patientName=this.value"></div>
+  <div class="form-g"><label>WhatsApp (com DDD)</label><input id="pPhone" placeholder="61999999999" value="${esc(patientPhone)}" oninput="patientPhone=this.value" type="tel"></div>
+  <div class="error" id="formErr">Preencha seu nome e WhatsApp para continuar</div>
+</div>
+<button class="primary" onclick="confirmBooking()">Confirmar Agendamento</button>
+<button style="background:transparent;color:var(--text2);width:100%;margin-top:8px;padding:8px;font-size:13px" onclick="step=1;renderStep1()">← Voltar</button>`;
+}
+
+function confirmBooking(){
+  const name=document.getElementById('pName').value.trim();
+  const phone=document.getElementById('pPhone').value.trim();
+  if(!name||!phone){document.getElementById('formErr').style.display='block';return}
+  patientName=name;patientPhone=phone;
+  step=3;renderStep3();
+}
+
+function renderStep3(){
+  if(!selectedSlot||!patientName||!patientPhone)return;
+  const c=document.getElementById('content');
+  const d=new Date(selectedSlot.date);
+  const msg=`Olá! Gostaria de agendar uma consulta.
+Data: ${d.toLocaleDateString('pt-BR')}
+Horário: ${selectedSlot.time} (${config.dur}min)
+Valor: R$ ${config.price||'—'}
+
+Paciente: ${patientName}
+WhatsApp: ${patientPhone}`;
+  const waNum=config.wa||'';
+  const waLink=waNum?`https://wa.me/55${waNum.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`:'';
+  c.innerHTML=`
+<div class="steps"><div class="step done">✓</div><div class="step done">✓</div><div class="step act">3</div></div>
+<div class="conf-box">
+  <div class="icon">🎉</div>
+  <h2>Quase lá!</h2>
+  <p>Confirme seu agendamento enviando uma mensagem no WhatsApp do profissional.</p>
+  <div class="card">
+    <div class="conf-detail">
+      <strong>${patientName}</strong><br>
+      ${d.toLocaleDateString('pt-BR',{weekday:'long'})}, ${d.toLocaleDateString('pt-BR')} às ${selectedSlot.time}<br>
+      Duração: ${config.dur}min · Valor: R$ ${config.price||'—'}<br>
+      Tel: ${patientPhone}
+    </div>
+    ${waLink?`<a href="${waLink}" target="_blank" class="whatsapp-btn">📱 Confirmar via WhatsApp</a>
+    <p style="font-size:12px;color:var(--text2);margin-top:8px;text-align:center">Você será redirecionado ao WhatsApp para confirmar.</p>`:'<p style="color:var(--red);font-size:13px">WhatsApp do profissional não configurado.</p>'}
+  </div>
+  <button style="background:transparent;color:var(--text2);padding:8px;font-size:13px;margin-top:8px" onclick="step=1;selectedSlot=null;renderStep1()">← Agendar outro horário</button>
+</div>`;
+}
+
+// Init
+document.title=config?'Agendar Consulta - PsiGestão':'Link inválido';
+if(config?.prof)document.getElementById('subtitle').textContent=`Agende sua consulta com ${config.prof}`;
+renderStep1();
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+</script>
+</body>
+</html>
