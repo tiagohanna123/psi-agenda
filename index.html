@@ -702,7 +702,7 @@ function quickBookSave(){
   if(!pid){toast('Selecione um paciente','err');return}
   const time=document.getElementById('qbT').value;
   const status=document.getElementById('qbS').value;
-  S.appointments.push({id:uid(),patientId:pid,date:window._qbDay.toISOString().split('T')[0],time,duration:S.settings.duration,status,payment:'pending',notes:'',createdAt:new Date().toISOString()});
+  S.appointments.push({id:uid(),patientId:pid,date:window._qbDay.toISOString().split('T')[0],time,duration:S.settings.duration,status,payment:'pending',paymentMethod:'pix-pos',notes:'',createdAt:new Date().toISOString()});
   saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
 
@@ -857,7 +857,7 @@ function openNewApptForPatient(pid){
 }
 
 function newApptForPatientSave(pid){
-  S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',notes:'',createdAt:new Date().toISOString()});
+  S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',paymentMethod:'pix-pos',notes:'',createdAt:new Date().toISOString()});
   saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
 
@@ -946,6 +946,9 @@ function openApptModal(id){
   <div class="form-g"><label>Pagamento</label>
     <select id="aPay"><option value="pending" ${a.payment==='pending'?'selected':''}>Pendente</option><option value="paid" ${a.payment==='paid'?'selected':''}>Pago</option><option value="free" ${a.payment==='free'?'selected':''}>Isento</option></select>
   </div>
+  <div class="form-g"><label>Tipo de pagamento</label>
+    <select id="aPayMethod"><option value="pix-pos" ${(a.paymentMethod||'pix-pos')==='pix-pos'?'selected':''}>PIX Pós-pago</option><option value="pix-pre" ${a.paymentMethod==='pix-pre'?'selected':''}>PIX Pré-pago</option><option value="dinheiro" ${a.paymentMethod==='dinheiro'?'selected':''}>Dinheiro</option><option value="cartao" ${a.paymentMethod==='cartao'?'selected':''}>Cartão</option></select>
+  </div>
 </div>
 <div class="form-g"><label>Duracao (min)</label><input type="number" id="aDur" value="${a.duration||S.settings.duration}" min="30" max="120" step="10"></div>
 <div class="form-g"><label>Anotacoes clinicas</label>
@@ -988,6 +991,7 @@ function saveAppt(id){
   a.time=document.getElementById('aTime').value;
   a.status=document.getElementById('aStatus').value;
   a.payment=document.getElementById('aPay').value;
+  a.paymentMethod=document.getElementById('aPayMethod').value;
   a.duration=parseInt(document.getElementById('aDur').value)||S.settings.duration;
   a.notes=document.getElementById('aNotes').value;
   saveState();closeModal();toast('Consulta atualizada ★');renderTab();
@@ -996,7 +1000,7 @@ function saveAppt(id){
 function duplicateAppt(id){
   const a=S.appointments.find(x=>x.id===id);
   if(!a)return;
-  const copy={...a,id:uid(),date:today().toISOString().split('T')[0],status:'pending',payment:'pending',notes:'',createdAt:new Date().toISOString()};
+  const copy={...a,id:uid(),date:today().toISOString().split('T')[0],status:'pending',payment:'pending',paymentMethod:'pix-pos',notes:'',createdAt:new Date().toISOString()};
   S.appointments.push(copy);saveState();toast('Consulta duplicada');closeModal();renderTab();
 }
 
@@ -1026,7 +1030,7 @@ function openNewApptModal(){
 
 function newApptSave(){
   const pid=document.getElementById('naP').value;
-  S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',notes:'',createdAt:new Date().toISOString()});
+  S.appointments.push({id:uid(),patientId:pid,date:document.getElementById('naD').value,time:document.getElementById('naT').value,duration:S.settings.duration,status:document.getElementById('naS').value,payment:'pending',paymentMethod:'pix-pos',notes:'',createdAt:new Date().toISOString()});
   saveState();closeModal();toast('Consulta agendada ★');renderTab();
 }
 
@@ -1042,12 +1046,25 @@ function renderFinance(c){
   const canceled=monthApps.filter(a=>a.status==='cancelled').length;
   const receitaTotal=monthApps.filter(a=>a.status!=='cancelled'&&a.payment!=='free').length*S.settings.sessionValue;
   const inadimplencia=receitaTotal>0?Math.round((receitaTotal-paid)/receitaTotal*100):0;
+  const pixPreCount=monthApps.filter(a=>a.payment==='paid'&&a.paymentMethod==='pix-pre').length;
+  const pixPosCount=monthApps.filter(a=>a.payment==='paid'&&a.paymentMethod==='pix-pos').length;
+  const pixPreVal=pixPreCount*S.settings.sessionValue;
+  const pixPosVal=pixPosCount*S.settings.sessionValue;
+  const outrosVal=paid-pixPreVal-pixPosVal;
   c.innerHTML=`
 <div class="stat-grid">
   <div class="stat-c"><div class="stat-l">Faturamento</div><div class="stat-v" style="color:var(--green)">R$ ${paid.toFixed(2)}</div></div>
   <div class="stat-c"><div class="stat-l">A Receber</div><div class="stat-v" style="color:var(--amber)">R$ ${pending.toFixed(2)}</div></div>
   <div class="stat-c"><div class="stat-l">Sessoes</div><div class="stat-v">${total}</div></div>
   <div class="stat-c"><div class="stat-l">Inadimplencia</div><div class="stat-v" style="color:${inadimplencia>20?'var(--red)':inadimplencia>10?'var(--amber)':'var(--green)'}">${inadimplencia}%</div></div>
+</div>
+<div class="card">
+  <div class="card-h"><h3>★ Pix Pré vs Pós-pago</h3></div>
+  <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-c"><div class="stat-l">PIX Pré</div><div class="stat-v" style="color:var(--accent);font-size:20px">R$ ${pixPreVal.toFixed(2)}</div><div class="stat-l">${pixPreCount}x</div></div>
+    <div class="stat-c"><div class="stat-l">PIX Pos</div><div class="stat-v" style="color:var(--blue);font-size:20px">R$ ${pixPosVal.toFixed(2)}</div><div class="stat-l">${pixPosCount}x</div></div>
+    <div class="stat-c"><div class="stat-l">Outros</div><div class="stat-v" style="color:var(--text2);font-size:20px">R$ ${Math.max(0,outrosVal).toFixed(2)}</div></div>
+  </div>
 </div>
 <div class="card">
   <div class="card-h"><h3>★ Historico</h3><button class="outline sm" onclick="exportCSV()">📥 CSV</button></div>
