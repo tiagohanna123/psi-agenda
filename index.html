@@ -336,24 +336,54 @@ tr:hover td{background:var(--bg3)}
 // STATE
 // ==============================
 const S={patients:[],appointments:[],settings:{},bookingLinks:[],notes:[],muralItems:[]};
-const LS=k=>JSON.parse(localStorage.getItem('bf_'+k)||'null');
-const LSS=(k,v)=>localStorage.setItem('bf_'+k,JSON.stringify(v));
 let curTab='dashboard',curWeek=0;
 
-function loadState(){
-  S.patients=LS('patients')||[];
-  S.appointments=LS('appointments')||[];
-  S.settings=LS('settings')||{
-    sessionValue:150,duration:50,name:'Dr(a)',whatsapp:'',crp:'',endereco:'',telefone:'',pix:'',
-    notify:true,
-    msgConfirm:'Olá {nome}! Sua consulta foi confirmada para {data} às {hora}. Estarei esperando por você. ★',
-    msgRemind:'Olá {nome}! Lembrete: amanhã temos consulta às {hora}. Confirme sua presença! ★',
-    msgCancel:'Olá {nome}! Sua consulta de {data} às {hora} precisou ser cancelada. Me avise se quiser reagendar. ★',
-    videoLink:'https://meet.google.com/'
-  };
-  S.bookingLinks=LS('bookingLinks')||[];
-  S.notes=LS('notes')||[];
-  S.muralItems=LS('muralItems')||getDefaultMural();
+// ─── API Layer ──────────────────────────
+const API_BASE='/api';
+function getToken(){return sessionStorage.getItem('bf_token')}
+function setToken(t){if(t)sessionStorage.setItem('bf_token',t);else sessionStorage.removeItem('bf_token')}
+async function apiPost(path,body){
+  const headers={'Content-Type':'application/json'};
+  const tok=getToken();if(tok)headers['X-Auth-Token']=tok;
+  const r=await fetch(API_BASE+path,{method:'POST',headers,body:JSON.stringify(body)});
+  if(!r.ok){const e=await r.json().catch(()=>({error:'Request failed'}));throw new Error(e.error||'Request failed')}
+  return r.json()
+}
+async function apiGet(path){
+  const headers={};
+  const tok=getToken();if(tok)headers['X-Auth-Token']=tok;
+  const r=await fetch(API_BASE+path,{headers});
+  if(!r.ok){const e=await r.json().catch(()=>({error:'Request failed'}));throw new Error(e.error||'Request failed')}
+  return r.json()
+}
+
+async function loadState(){
+  try{
+    const d=await apiGet('/data');
+    if(d.patients)S.patients=d.patients;
+    if(d.appointments)S.appointments=d.appointments;
+    if(d.settings)S.settings=d.settings;else S.settings={sessionValue:150,duration:50,name:'Dr(a)',whatsapp:'',crp:'',endereco:'',telefone:'',pix:'',notify:true,msgConfirm:'Olá {nome}! Sua consulta foi confirmada para {data} às {hora}. Estarei esperando por você. ★',msgRemind:'Olá {nome}! Lembrete: amanhã temos consulta às {hora}. Confirme sua presença! ★',msgCancel:'Olá {nome}! Sua consulta de {data} às {hora} precisou ser cancelada. Me avise se quiser reagendar. ★',videoLink:'https://meet.google.com/'};
+    if(d.bookingLinks)S.bookingLinks=d.bookingLinks;
+    if(d.notes)S.notes=d.notes;
+    if(d.muralItems)S.muralItems=d.muralItems;
+  }catch(e){
+    console.error('loadState:',e);
+    S.settings={sessionValue:150,duration:50,name:'Dr(a)',whatsapp:'',crp:'',endereco:'',telefone:'',pix:'',notify:true,msgConfirm:'',msgRemind:'',msgCancel:'',videoLink:''};
+    S.muralItems=getDefaultMural();
+  }
+}
+
+function saveState(){
+  const tok=getToken();
+  if(!tok)return;
+  fetch(API_BASE+'/data',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-Auth-Token':tok},
+    body:JSON.stringify({
+      patients:S.patients,appointments:S.appointments,settings:S.settings,
+      bookingLinks:S.bookingLinks,notes:S.notes,muralItems:S.muralItems
+    })
+  }).catch(e=>{console.error('saveState:',e);toast('Erro ao salvar','err')});
 }
 
 function getDefaultMural(){
@@ -364,15 +394,6 @@ function getDefaultMural(){
     {id:'m4',icon:'⚖️',title:'Resoluções CFP',desc:'Legislação atualizada do exercício profissional','url':'https://site.cfp.org.br/legislacao/'},
     {id:'m5',icon:'📞',title:'CVV — Centro de Valorização da Vida',desc:'Apoio emocional gratuito: 188','url':'https://www.cvv.org.br/'},
   ];
-}
-
-function saveState(){
-  LSS('patients',S.patients);
-  LSS('appointments',S.appointments);
-  LSS('settings',S.settings);
-  LSS('bookingLinks',S.bookingLinks);
-  LSS('notes',S.notes);
-  LSS('muralItems',S.muralItems);
 }
 
 // ==============================
@@ -1318,7 +1339,7 @@ function renderInsights(c){
 // BOOKING LINKS
 // ==============================
 function renderBookLinks(c){
-  c.innerHTML=`<div class="card-h"><h3>★ Links de Agendamento</h3><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link</button></div><p style="font-size:13px;color:var(--text2);margin-bottom:16px">Compartilhe o link com seus pacientes. Eles escolhem o horario e agendam pelo WhatsApp.</p>${S.bookingLinks.length?S.bookingLinks.map(bl=>{const data=btoa(encodeURIComponent(JSON.stringify({name:bl.name,days:bl.days,start:bl.startHour,end:bl.endHour,dur:bl.duration,price:bl.price,gap:bl.gap,msg:bl.message,wa:S.settings.whatsapp,prof:S.settings.name,video:S.settings.videoLink})));const url=window.location.origin+'/psi-agenda/agendar/?d='+data;return '<div class="bl-card"><div class="bl-h"><h4>'+esc(bl.name)+'</h4><div style="display:flex;gap:4px"><button class="btn-icon" onclick="copyText(\''+url+'\')" title="Copiar">📋</button><button class="btn-icon" onclick="toggleBookingLink(\''+bl.id+'\')" title="'+(bl.active?'Desativar':'Ativar')+'">'+(bl.active?'✅':'⏸️')+'</button><button class="btn-icon" onclick="deleteBookingLink(\''+bl.id+'\')" title="Excluir" style="color:var(--red)">🗑️</button></div></div><div class="bl-url"><code>'+url+'</code><button class="btn-icon" onclick="copyText(\''+url+'\')">📋</button><a href="'+url+'" target="_blank" class="btn-icon">↗️</a></div><div style="font-size:12px;color:var(--text2)"><span class="bl-tag">'+(bl.days?.join(', ')||'Seg-Sex')+'</span><span class="bl-tag">'+(bl.startHour||'08')+':00 - '+(bl.endHour||'18')+':00</span><span class="bl-tag">'+(bl.duration||50)+'min</span><span class="bl-tag">★ R$ '+(bl.price||S.settings.sessionValue)+'</span>'+(bl.active?'':'<span class="bl-tag" style="background:rgba(239,68,68,.15);color:var(--red)">Inativo</span>')+'</div></div>'}).join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhum link de agendamento criado ainda.<br>Crie um link para pacientes agendarem online.</div>'}<div style="margin-top:12px"><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link de Agendamento</button></div>`;
+  c.innerHTML=`<div class="card-h"><h3>★ Links de Agendamento</h3><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link</button></div><p style="font-size:13px;color:var(--text2);margin-bottom:16px">Compartilhe o link com seus pacientes. Eles escolhem o horario e agendam pelo WhatsApp.</p>${S.bookingLinks.length?S.bookingLinks.map(bl=>{const data=btoa(encodeURIComponent(JSON.stringify({name:bl.name,days:bl.days,start:bl.startHour,end:bl.endHour,dur:bl.duration,price:bl.price,gap:bl.gap,msg:bl.message,wa:S.settings.whatsapp,prof:S.settings.name,video:S.settings.videoLink})));const url=window.location.origin+'/agendar/?d='+data;return '<div class="bl-card"><div class="bl-h"><h4>'+esc(bl.name)+'</h4><div style="display:flex;gap:4px"><button class="btn-icon" onclick="copyText(\''+url+'\')" title="Copiar">📋</button><button class="btn-icon" onclick="toggleBookingLink(\''+bl.id+'\')" title="'+(bl.active?'Desativar':'Ativar')+'">'+(bl.active?'✅':'⏸️')+'</button><button class="btn-icon" onclick="deleteBookingLink(\''+bl.id+'\')" title="Excluir" style="color:var(--red)">🗑️</button></div></div><div class="bl-url"><code>'+url+'</code><button class="btn-icon" onclick="copyText(\''+url+'\')">📋</button><a href="'+url+'" target="_blank" class="btn-icon">↗️</a></div><div style="font-size:12px;color:var(--text2)"><span class="bl-tag">'+(bl.days?.join(', ')||'Seg-Sex')+'</span><span class="bl-tag">'+(bl.startHour||'08')+':00 - '+(bl.endHour||'18')+':00</span><span class="bl-tag">'+(bl.duration||50)+'min</span><span class="bl-tag">★ R$ '+(bl.price||S.settings.sessionValue)+'</span>'+(bl.active?'':'<span class="bl-tag" style="background:rgba(239,68,68,.15);color:var(--red)">Inativo</span>')+'</div></div>'}).join(''):'<div style="text-align:center;padding:40px;color:var(--text2)">Nenhum link de agendamento criado ainda.<br>Crie um link para pacientes agendarem online.</div>'}<div style="margin-top:12px"><button class="primary sm" onclick="openNewBookingLink()">+ Novo Link de Agendamento</button></div>`;
 }
 
 function openNewBookingLink(){const m=document.getElementById('modal');m.innerHTML=`<div class="modal-h"><h3>Novo Link de Agendamento</h3><button class="btn-icon" onclick="closeModal()">✕</button></div><div class="form-g"><label>Nome do link</label><input id="blName" placeholder="Agendamento Online" value="Agendamento Online"></div><div class="form-row"><div class="form-g"><label>Dias disponiveis</label><div style="display:flex;gap:4px;flex-wrap:wrap">${['Seg','Ter','Qua','Qui','Sex','Sab'].map((d,i)=>'<label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;padding:4px 8px;background:var(--bg3);border-radius:var(--r2)"><input type="checkbox" id="blD'+i+'" '+(i<5?'checked':'')+'>'+d+'</label>').join('')}</div></div><div class="form-g"><label>Duracao (min)</label><input type="number" id="blDur" value="${S.settings.duration}" min="30" max="120" step="10"></div></div><div class="form-row"><div class="form-g"><label>Inicio</label><input type="time" id="blStart" value="08:00"></div><div class="form-g"><label>Fim</label><input type="time" id="blEnd" value="18:00"></div></div><div class="form-row"><div class="form-g"><label>Valor (R$)</label><input type="number" id="blPrice" value="${S.settings.sessionValue}" min="0"></div><div class="form-g"><label>Intervalo entre sessoes (min)</label><input type="number" id="blGap" value="10" min="0" max="60"></div></div><div class="form-g"><label>Mensagem de boas-vindas</label><textarea id="blMsg" rows="2">Ola! Escolha o melhor horario para sua consulta. ⚽</textarea></div><div class="form-actions"><button class="btn-ghost" onclick="closeModal()">Cancelar</button><button class="primary" onclick="saveBookingLink()">Criar Link</button></div>`;document.getElementById('modalO').classList.add('show');}
@@ -1359,15 +1380,48 @@ function closeSidebar(){document.getElementById('aside').classList.remove('open'
 // ==============================
 // LOGIN
 // ==============================
-function tryLogin(){const pw=document.getElementById('pw').value;if(pw==='ojoaojm123'){sessionStorage.setItem('bf_logged','1');document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex'}else{document.getElementById('loginE').style.display='block';document.getElementById('pw').value=''}}
-function logout(){document.getElementById('app').style.display='none';document.getElementById('login').style.display='flex';document.getElementById('pw').value='';document.getElementById('loginE').style.display='none'}
+async function tryLogin(){
+  const pw=document.getElementById('pw').value;
+  try{
+    const r=await apiPost('/auth/login',{password:pw});
+    if(r.ok&&r.token){
+      setToken(r.token);
+      await loadState();
+      sessionStorage.setItem('bf_logged','1');
+      document.getElementById('login').style.display='none';
+      document.getElementById('app').style.display='flex';
+      renderNav();renderTab();
+    }else{document.getElementById('loginE').style.display='block'}
+  }catch(e){document.getElementById('loginE').style.display='block';document.getElementById('pw').value=''}
+}
+function logout(){
+  setToken(null);
+  sessionStorage.removeItem('bf_logged');
+  document.getElementById('app').style.display='none';
+  document.getElementById('login').style.display='flex';
+  document.getElementById('pw').value='';
+  document.getElementById('loginE').style.display='none'
+}
 
 // ==============================
 // INIT
 // ==============================
-loadState();renderNav();
-if(sessionStorage.getItem('bf_logged')){document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';renderTab()}
-const _try=tryLogin;tryLogin=function(){const pw=document.getElementById('pw').value;if(pw==='ojoaojm123'){sessionStorage.setItem('bf_logged','1');_try()}};
+// Async init - wait for loadState if logged in
+(async()=>{
+  if(sessionStorage.getItem('bf_logged')&&getToken()){
+    try{
+      await loadState();
+      renderNav();renderTab();
+      document.getElementById('login').style.display='none';
+      document.getElementById('app').style.display='flex';
+    }catch(e){
+      console.error('init error:',e);
+      renderNav();
+    }
+  }else{
+    renderNav();
+  }
+})();
 </script>
 </body>
 </html>

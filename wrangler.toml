@@ -3,6 +3,11 @@ compatibility_date = "2025-04-01"
 
 pages_build_output_dir = "public"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "psi-agenda-db"
+database_id = "9dfa4fa4-b93d-4caf-b80d-d3e26285190a"
+
 [[redirects]]
 from = "/agendar"
 to = "/agendar/"
