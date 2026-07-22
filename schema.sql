@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS settings (
   msg_confirm TEXT DEFAULT 'Olá {nome}! Sua consulta foi confirmada para {data} às {hora}. Estarei esperando por você. ★',
   msg_remind TEXT DEFAULT 'Olá {nome}! Lembrete: amanhã temos consulta às {hora}. Confirme sua presença! ★',
   msg_cancel TEXT DEFAULT 'Olá {nome}! Sua consulta de {data} às {hora} precisou ser cancelada. Me avise se quiser reagendar. ★',
+  msg_charge TEXT DEFAULT 'Olá {nome}! Sua consulta de {data} no valor de R$ {valor} está pendente. Pix: {pix} 🏳️‍🌈',
   video_link TEXT DEFAULT 'https://meet.google.com/'
 );
 
