@@ -357,6 +357,44 @@ async function apiGet(path){
   return r.json()
 }
 
+function hasLocalData(){
+  try{return !!localStorage.getItem('bf_patients')}catch(e){return false}
+}
+function readLocalData(){
+  try{
+    const LS=k=>JSON.parse(localStorage.getItem('bf_'+k)||'null');
+    return {
+      patients:LS('patients')||[],
+      appointments:LS('appointments')||[],
+      settings:LS('settings')||null,
+      bookingLinks:LS('bookingLinks')||[],
+      notes:LS('notes')||[],
+      muralItems:LS('muralItems')||null,
+    }
+  }catch(e){return null}
+}
+function clearLocalData(){
+  const keys=Object.keys(localStorage).filter(k=>k.startsWith('bf_'));
+  keys.forEach(k=>localStorage.removeItem(k));
+}
+
+async function migrateLocalData(){
+  const data=readLocalData();
+  if(!data||!data.patients.length)return false;
+  const tok=getToken();
+  if(!tok)return false;
+  try{
+    const r=await fetch(API_BASE+'/data',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Auth-Token':tok},
+      body:JSON.stringify(data)
+    });
+    if(!r.ok)return false;
+    clearLocalData();
+    return true;
+  }catch(e){return false}
+}
+
 async function loadState(){
   try{
     const d=await apiGet('/data');
@@ -1368,8 +1406,19 @@ function deleteNote(id){if(!confirm('Excluir esta nota?'))return;S.notes=S.notes
 // ==============================
 // SETTINGS
 // ==============================
-function renderSettings(c){c.innerHTML=`<div class="card"><div class="set-g"><h4>🏳️‍🌈 Dados do consultorio</h4><div class="form-g"><label>Seu nome</label><input id="sName" value="${esc(S.settings.name)}"></div><div class="form-row"><div class="form-g"><label>CRP</label><input id="sCRP" value="${esc(S.settings.crp||'')}" placeholder="CRP 01/12345"></div><div class="form-g"><label>Telefone</label><input id="sTel" value="${esc(S.settings.telefone||'')}" placeholder="(61) 99999-9999"></div></div><div class="form-g"><label>Endereco do consultorio</label><input id="sEnd" value="${esc(S.settings.endereco||'')}" placeholder="Rua, numero, bairro"></div><div class="form-g"><label>Chave PIX</label><input id="sPix" value="${esc(S.settings.pix||'')}" placeholder="CPF, email ou telefone"></div></div><div class="set-g"><h4>📱 WhatsApp e Teleconsulta</h4><div class="form-g"><label>Seu WhatsApp (para links de agendamento)</label><input id="sWA" value="${esc(S.settings.whatsapp)}" placeholder="61999999999"></div><div class="form-g"><label>Link padrao de teleconsulta</label><input id="sVideo" value="${esc(S.settings.videoLink||'')}" placeholder="https://meet.google.com/"></div></div><div class="set-g"><h4>⚙️ Padroes de consulta</h4><div class="form-row"><div class="form-g"><label>Valor da sessao (R$)</label><input type="number" id="sVal" value="${S.settings.sessionValue}" min="0"></div><div class="form-g"><label>Duracao (min)</label><input type="number" id="sDur" value="${S.settings.duration}" min="30" max="120" step="10"></div></div></div><div class="set-g"><h4>💬 Modelos de mensagem WhatsApp</h4><div class="form-g"><label>Confirmacao</label><textarea id="sMsgC" rows="2">${esc(S.settings.msgConfirm||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div><div class="form-g"><label>Lembrete</label><textarea id="sMsgR" rows="2">${esc(S.settings.msgRemind||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div><div class="form-g"><label>Cancelamento</label><textarea id="sMsgX" rows="2">${esc(S.settings.msgCancel||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div></div><button class="primary" onclick="saveSettings()">★ Salvar Configuracoes</button></div>`;}
+function renderSettings(c){c.innerHTML=`<div class="card"><div class="set-g"><h4>🏳️‍🌈 Dados do consultorio</h4><div class="form-g"><label>Seu nome</label><input id="sName" value="${esc(S.settings.name)}"></div><div class="form-row"><div class="form-g"><label>CRP</label><input id="sCRP" value="${esc(S.settings.crp||'')}" placeholder="CRP 01/12345"></div><div class="form-g"><label>Telefone</label><input id="sTel" value="${esc(S.settings.telefone||'')}" placeholder="(61) 99999-9999"></div></div><div class="form-g"><label>Endereco do consultorio</label><input id="sEnd" value="${esc(S.settings.endereco||'')}" placeholder="Rua, numero, bairro"></div><div class="form-g"><label>Chave PIX</label><input id="sPix" value="${esc(S.settings.pix||'')}" placeholder="CPF, email ou telefone"></div></div><div class="set-g"><h4>📱 WhatsApp e Teleconsulta</h4><div class="form-g"><label>Seu WhatsApp (para links de agendamento)</label><input id="sWA" value="${esc(S.settings.whatsapp)}" placeholder="61999999999"></div><div class="form-g"><label>Link padrao de teleconsulta</label><input id="sVideo" value="${esc(S.settings.videoLink||'')}" placeholder="https://meet.google.com/"></div></div><div class="set-g"><h4>⚙️ Padroes de consulta</h4><div class="form-row"><div class="form-g"><label>Valor da sessao (R$)</label><input type="number" id="sVal" value="${S.settings.sessionValue}" min="0"></div><div class="form-g"><label>Duracao (min)</label><input type="number" id="sDur" value="${S.settings.duration}" min="30" max="120" step="10"></div></div></div><div class="set-g"><h4>💬 Modelos de mensagem WhatsApp</h4><div class="form-g"><label>Confirmacao</label><textarea id="sMsgC" rows="2">${esc(S.settings.msgConfirm||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div><div class="form-g"><label>Lembrete</label><textarea id="sMsgR" rows="2">${esc(S.settings.msgRemind||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div><div class="form-g"><label>Cancelamento</label><textarea id="sMsgX" rows="2">${esc(S.settings.msgCancel||'')}</textarea><div class="hint">Use {nome}, {data}, {hora}</div></div></div><div class="set-g"><h4>🔒 Senha de acesso</h4><div class="form-row"><div class="form-g"><label>Nova senha</label><input type="password" id="sPwNew" placeholder="Nova senha"></div><div class="form-g"><label>Confirmar</label><input type="password" id="sPwConfirm" placeholder="Confirmar senha"></div></div><button class="outline sm" onclick="changePassword()">Alterar senha</button></div><button class="primary" onclick="saveSettings()">★ Salvar Configuracoes</button></div>`;}
 function saveSettings(){S.settings.name=document.getElementById('sName').value.trim()||'Dr(a)';S.settings.whatsapp=document.getElementById('sWA').value.trim();S.settings.crp=document.getElementById('sCRP').value.trim();S.settings.telefone=document.getElementById('sTel').value.trim();S.settings.endereco=document.getElementById('sEnd').value.trim();S.settings.pix=document.getElementById('sPix').value.trim();S.settings.videoLink=document.getElementById('sVideo').value.trim();S.settings.sessionValue=parseFloat(document.getElementById('sVal').value)||150;S.settings.duration=parseInt(document.getElementById('sDur').value)||50;S.settings.msgConfirm=document.getElementById('sMsgC').value.trim();S.settings.msgRemind=document.getElementById('sMsgR').value.trim();S.settings.msgCancel=document.getElementById('sMsgX').value.trim();saveState();toast('🏳️‍🌈 Configuracoes salvas!');}
+async function changePassword(){
+  const pw=document.getElementById('sPwNew').value;
+  const cf=document.getElementById('sPwConfirm').value;
+  if(!pw||pw.length<4){toast('Senha deve ter no minimo 4 caracteres','err');return}
+  if(pw!==cf){toast('Senhas nao conferem','err');return}
+  try{
+    const r=await apiPost('/auth/password',{password:pw});
+    if(r.ok){toast('★ Senha alterada com sucesso!');document.getElementById('sPwNew').value='';document.getElementById('sPwConfirm').value=''}
+    else toast('Erro ao alterar senha','err');
+  }catch(e){toast('Erro ao alterar senha: '+e.message,'err')}
+}
 
 // ==============================
 // SIDEBAR & MODAL
@@ -1387,6 +1436,11 @@ async function tryLogin(){
     if(r.ok&&r.token){
       setToken(r.token);
       await loadState();
+      // Migrate localStorage data if API is empty but local has data
+      if(!S.patients.length&&hasLocalData()){
+        const migrated=await migrateLocalData();
+        if(migrated){await loadState();toast('★ Dados migrados do navegador para o servidor!')}
+      }
       sessionStorage.setItem('bf_logged','1');
       document.getElementById('login').style.display='none';
       document.getElementById('app').style.display='flex';
